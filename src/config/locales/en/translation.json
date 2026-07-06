@@ -1,0 +1,368 @@
+{
+  "greeting_message": "Hi, how are you?",
+  "created_text": "Created {{time}}  ",
+  "expires_text": "Expires {{time}} ",
+  "general_error": "An error has occured",
+  "more": "More",
+  "and": "and",
+  "home": {
+    "hero": {
+      "eyebrow": "React + Vite + TypeScript",
+      "title": "A production-ready frontend template",
+      "subtitle": "Authentication, role-based access control, dashboards, and data tables — wired up and ready, so you can start on your product instead of your boilerplate.",
+      "get_started": "Get started",
+      "sign_in": "Sign in",
+      "go_to_dashboard": "Go to dashboard"
+    },
+    "features": {
+      "title": "Everything already wired up",
+      "subtitle": "The pieces every dashboard app needs, built in from the start.",
+      "auth": {
+        "title": "Authentication",
+        "description": "JWT or session-based auth with automatic token refresh, out of the box."
+      },
+      "rbac": {
+        "title": "Role & permission based access",
+        "description": "Route guards and component HOCs for coarse roles and fine-grained permissions."
+      },
+      "dashboards": {
+        "title": "Dashboard layout",
+        "description": "A responsive shell with navigation, theming, and progress feedback on every route."
+      },
+      "i18n": {
+        "title": "Internationalization",
+        "description": "Multi-language support powered by i18next, synced with the signed-in user's locale."
+      },
+      "data_tables": {
+        "title": "Data tables",
+        "description": "Sortable, paginated, filterable tables ready to plug into any list endpoint."
+      },
+      "performance": {
+        "title": "Built for speed",
+        "description": "Vite, lazy-loaded routes, and code-split pages keep the app fast by default."
+      }
+    },
+    "cta": {
+      "title": "Start building today",
+      "subtitle": "Clone the template, set your environment variables, and you're off — the scaffolding is done.",
+      "get_started": "Create an account",
+      "sign_in": "Sign in"
+    }
+  },
+  "auth": {
+    "login_message": "Welcome again ",
+    "login_sub_message": "Login at {{company}}",
+    "signup_message": "Create your account",
+    "signup_sub_message": " Fill details below to create your account",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "confirm_password": "Confirm password",
+    "forgot_password": "Forgot your password?",
+    "have_no_account": "Don't have an account?",
+    "have_account": "Already have an account?",
+    "signup": "Sign up",
+    "login": "Log in",
+    "terms_message": "By clicking continue, you agree to our ",
+    "social_login_message": "Or continue with",
+    "logging": "Logging...",
+    "creating": "Creating Account...",
+    "terms": "Terms of Service",
+    "policy": "Privacy Policy",
+    "passwords_no_match": "Passwords do not match",
+    "register_failed": "Registration failed",
+    "email_verification_title": "Check your email",
+    "email_verification_message": " We've sent a verification link to your email address. Please verify your account before logging in.",
+    "logout_message": "You are logged Out successiful",
+    "continue_with_google": "Continue with Google",
+    "oauth_failed": "Sign-in failed",
+    "oauth_failed_message": "We couldn't complete the sign-in with your provider. Please try again."
+  },
+  "profile": {
+    "dashboard": "Dashboard",
+    "logout": "Log out",
+    "notification": "Notification",
+    "account": "Account",
+    "my_profile": "My Profile",
+    "session": "Sessions",
+    "role": "Role",
+    "permission": "Permission",
+    "name": "Name",
+    "first_name": "First name",
+    "last_name": "Last name",
+    "email": "Email",
+    "avatar": "My Photo",
+    "locale": "Preferred Locale",
+    "language": "Language",
+    "password": "Password",
+    "settings": "Settings",
+    "loading_profile_text": "Loading Profile...",
+    "personal_profile": "Personal Information",
+    "settings_message": "Manage your account settings and preferences.",
+    "personal_profile_text": "Update your photo and personal details here.",
+    "other_Settings": "Other Settings",
+    "other_Settings_text": "Set your personal preferences  here"
+  },
+  "notification": {
+    "news_letter": "Newsletter",
+    "news_letter_message": "Receive product updates, announcements, and tips via email.",
+    "email_notification_message": " Get notified about account activity and security alerts.",
+    "email_notification": "Email Notification",
+    "push_notifiction": "Push Notification",
+    "push_notifiction_message": " Receive rea -time notifications in your browser.",
+    "notification_mesage": "Manage how you receive updates and communications."
+  },
+  "password": {
+    "change_password_message": "Change your password to keep your account secure.",
+    "current_password": "Current Password",
+    "new_password": "New Password",
+    "confirm_passsword": "Confirm Password",
+    "password_match_error": "Password confirmation do not match"
+  },
+  "role_permission": {
+    "role_text": "Your assigned role determines your base level of access. Roles are managed by administrators.",
+    "permission_text": "All permissions granted to you — from your role and any direct grants. These determine what actions you can perform.",
+    "no_permission": "No permission Assigned",
+    "direct_permission": "Direct grants (in addition to role)"
+  },
+  "session": {
+    "session_text": "Manage your active sessions. Revoke any session you don't recognize.",
+    "loading_sessions": "Loading sessions...",
+    "active_sessions": "Active Sessions",
+    "no_sessions": "No active sessions",
+    "session_unkown_browser": "Unknown Browser",
+    "revoke_session_message": "Session Revoked Successiful"
+  },
+  "time": {
+    "justNow": "Just now",
+    "soon": "Soon",
+    "minute_one": "{{count}} minute ago",
+    "minute_other": "{{count}} minutes ago",
+    "hour_one": "{{count}} hour ago",
+    "hour_other": "{{count}} hours ago",
+    "day_one": "{{count}} day ago",
+    "day_other": "{{count}} days ago",
+    "month_one": "{{count}} month ago",
+    "month_other": "{{count}} months ago",
+    "year_one": "{{count}} year ago",
+    "year_other": "{{count}} years ago",
+    "in_minute_one": "in {{count}} minute",
+    "in_minute_other": "in {{count}} minutes",
+    "in_hour_one": "in {{count}} hour",
+    "in_hour_other": "in {{count}} hours",
+    "in_day_one": "in {{count}} day",
+    "in_day_other": "in {{count}} days",
+    "in_month_one": "in {{count}} month",
+    "in_month_other": "in {{count}} months",
+    "in_year_one": "in {{count}} year",
+    "in_year_other": "in {{count}} years",
+    "invalid_date": "Invalid Date"
+  },
+  "rbac": {
+    "title": "Roles & Permissions",
+    "subtitle": "Manage roles and browse every permission the system provides",
+    "roles_tab": "Roles",
+    "permissions_tab": "Permissions",
+    "roles_text": "Roles bundle permissions and are assigned to users",
+    "permissions_text": "All permissions the backend provides, grouped by domain",
+    "permissions_forbidden": "You do not have permission to view the permission catalog",
+    "new_role": "New Role",
+    "edit_role": "Edit Role",
+    "delete_role": "Delete Role",
+    "delete_role_confirm": "This will permanently delete the role \"{{name}}\". Users holding it will lose its permissions.",
+    "role_dialog_text": "Set the role name, description and the permissions it grants",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "actions": "Actions",
+    "active": "Active",
+    "inactive": "Inactive",
+    "delete": "Delete",
+    "no_roles": "No roles found",
+    "no_permissions": "No permissions found",
+    "assign_role": "Assign Role",
+    "assign_role_text": "Change the role this user holds",
+    "direct_permissions": "Direct Permissions",
+    "direct_permissions_text": "Extra grants on top of the role's permissions",
+    "effective_permissions": "Effective Permissions",
+    "effective_permissions_text": "Everything this user can do — role permissions plus direct grants"
+  },
+  "usersPage": {
+    "title": "Users",
+    "subtitle": "Manage user accounts, their roles and permissions",
+    "total": "{{count}} users in total",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "verified": "Verified",
+    "unverified": "Unverified",
+    "no_users": "No users found",
+    "search_placeholder": "Search by email...",
+    "delete_user": "Delete User",
+    "delete_user_confirm": "This will permanently delete {{name}} and cannot be undone.",
+    "details_title": "Account Details",
+    "page_of": "Page {{page}} of {{total}}",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "campaignsPage": {
+    "title": "Newsletter Campaigns",
+    "subtitle": "Compose, schedule and send email campaigns to newsletter subscribers",
+    "total": "{{count}} campaigns in total",
+    "new_campaign": "New Campaign",
+    "edit_campaign": "Edit Campaign",
+    "dialog_text": "Write the subject and both HTML and plain-text bodies of the email",
+    "subject": "Subject",
+    "body_html": "HTML Body",
+    "body_text": "Plain-text Body",
+    "status": "Status",
+    "recipients": "Recipients",
+    "scheduled_at": "Scheduled",
+    "sent_at": "Sent",
+    "no_campaigns": "No campaigns found",
+    "search_placeholder": "Search by subject...",
+    "send_now": "Send Now",
+    "send_confirm": "This will send \"{{subject}}\" to every active newsletter subscriber.",
+    "schedule": "Schedule",
+    "schedule_text": "Pick when \"{{subject}}\" should be sent",
+    "delete_campaign": "Delete Campaign",
+    "delete_confirm": "This will permanently delete the campaign \"{{subject}}\".",
+    "total_recipients": "{{count}} recipients",
+    "statuses": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "sending": "Sending",
+      "sent": "Sent",
+      "failed": "Failed"
+    }
+  },
+  "campaignDetails": {
+    "back_to_campaigns": "Back to campaigns",
+    "content_title": "Content",
+    "recipients_title": "Recipients",
+    "recipient": "Recipient",
+    "email": "Email",
+    "delivery_status": "Delivery Status",
+    "error": "Error",
+    "recipient_statuses": {
+      "pending": "Pending",
+      "queued": "Queued",
+      "sent": "Sent",
+      "failed": "Failed"
+    }
+  },
+  "subscribersPage": {
+    "title": "Newsletter Subscribers",
+    "subtitle": "Everyone who has subscribed to the newsletter",
+    "total": "{{count}} subscribers in total",
+    "name": "Name",
+    "email": "Email",
+    "status": "Status",
+    "subscribed_at": "Subscribed",
+    "search_placeholder": "Search by email..."
+  },
+  "visitorsPage": {
+    "title": "Visitor Analytics",
+    "subtitle": "Traffic overview and the raw page-view log",
+    "stats_tab": "Daily Stats",
+    "views_tab": "Page Views",
+    "stats_text": "Views and unique visitors per path per day",
+    "views_text": "{{count}} page views recorded",
+    "date": "Date",
+    "time": "Time",
+    "path": "Path",
+    "views": "Views",
+    "unique_visitors": "Unique Visitors",
+    "referrer": "Referrer",
+    "country": "Country",
+    "visitor": "Visitor",
+    "registered": "Registered",
+    "anonymous": "Anonymous",
+    "no_data": "No data yet",
+    "search_placeholder": "Search by path..."
+  },
+  "dataTable": {
+    "search": "Search...",
+    "clear": "Clear",
+    "all_option": "All — {{label}}",
+    "results_one": "{{count}} result",
+    "results_other": "{{count}} results",
+    "no_results": "No results found",
+    "rows_per_page": "Rows per page"
+  },
+  "actions": {
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "send": "Send",
+    "sending": "Sending...",
+    "cancel": "Cancel",
+    "upload": "Upload",
+    "click_to_upload": "Click to Upload",
+    "uploading": "Uploading...",
+    "loading": "Loading...",
+    "update": "Update",
+    "updating": "Updating..."
+  },
+  "footer": {
+    "maker_message": "{{year}} Built by {{company}}",
+    "right_reserved_message": "All rights reserved",
+    "newsletter_subscription": "Subscribe to our news letter"
+  },
+  "dashboards": {
+    "navMain": {
+      "title": "Platform",
+      "dashboard": {
+        "title": "Dashboard",
+        "home": "Home",
+        "users": "Users",
+        "history": "History",
+        "analytics": "Analytics"
+      },
+      "settings": {
+        "title": "Settings",
+        "system_settings": "System Settings",
+        "my_account": "My Account"
+      },
+      "role_permissions": {
+        "title": "Roles & Permissions",
+        "roles": "Roles",
+        "permissions": "Permissions"
+      },
+      "newsletter": {
+        "title": "Newsletter",
+        "campaigns": "Campaigns",
+        "subscribers": "Subscribers",
+        "visitors": "Visitor Analytics"
+      }
+    },
+    "subMain": {
+      "title": "Departments",
+      "action": {
+        "view": "View ",
+        "save": "Save ",
+        "delete": "Delete "
+      },
+      "multimedia": "Multimedia",
+      "software": "Software",
+      "design": "Graphics Design"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "aria_label": "Open notifications",
+    "mark_all_read": "Mark all read",
+    "empty": "No notifications yet",
+    "welcome_title": "Welcome, {{firstName}}!",
+    "welcome_message": "Your account is verified and ready to use.",
+    "campaign_sent_title": "Campaign sent",
+    "campaign_sent_message": "\"{{subject}}\" was delivered to your subscribers.",
+    "campaign_failed_title": "Campaign failed",
+    "campaign_failed_message": "\"{{subject}}\" could not be sent. Check the campaign and try again."
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Enter a valid email address",
+    "password_min": "Password must be at least {{count}} characters"
+  }
+}

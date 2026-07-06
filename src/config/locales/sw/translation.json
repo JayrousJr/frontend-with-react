@@ -1,0 +1,368 @@
+{
+  "greeting_message": "Habari, hujambo?",
+  "created_text": "Imeundwa {{time}}",
+  "expires_text": "Inaisha muda {{time}}",
+  "general_error": "Hitilafu imetokea",
+  "more": "Zaidi",
+  "and": "na",
+  "home": {
+    "hero": {
+      "eyebrow": "React + Vite + TypeScript",
+      "title": "Kiolezo cha mbele kilicho tayari kwa uzalishaji",
+      "subtitle": "Uthibitishaji, udhibiti wa ufikiaji kwa majukumu, dashibodi, na jedwali za data — tayari kutumika, ili uanze kwenye bidhaa yako badala ya msingi wa msimbo.",
+      "get_started": "Anza",
+      "sign_in": "Ingia",
+      "go_to_dashboard": "Nenda kwenye dashibodi"
+    },
+    "features": {
+      "title": "Kila kitu tayari kimeunganishwa",
+      "subtitle": "Vipengele vyote ambavyo programu ya dashibodi inahitaji, tayari vimewekwa tangu mwanzo.",
+      "auth": {
+        "title": "Uthibitishaji",
+        "description": "Uthibitishaji wa JWT au session wenye upyaji wa tokeni kiotomatiki, tayari kutumika."
+      },
+      "rbac": {
+        "title": "Ufikiaji kwa majukumu na ruhusa",
+        "description": "Vizuizi vya njia na HOC za vipengele kwa majukumu makuu na ruhusa maalum."
+      },
+      "dashboards": {
+        "title": "Muundo wa dashibodi",
+        "description": "Muundo unaojirekebisha wenye uongozaji, mandhari, na maoni ya maendeleo kwenye kila njia."
+      },
+      "i18n": {
+        "title": "Tafsiri za lugha nyingi",
+        "description": "Msaada wa lugha nyingi kwa kutumia i18next, ulioratibiwa na lugha ya mtumiaji aliyeingia."
+      },
+      "data_tables": {
+        "title": "Jedwali za data",
+        "description": "Jedwali zenye upangaji, kurasa, na uchujaji, tayari kuunganishwa na sehemu yoyote ya orodha."
+      },
+      "performance": {
+        "title": "Imejengwa kwa kasi",
+        "description": "Vite, njia zinazopakiwa polepole, na kurasa zilizogawanywa huweka programu ikiwa na kasi kila wakati."
+      }
+    },
+    "cta": {
+      "title": "Anza kujenga leo",
+      "subtitle": "Nakili kiolezo, weka mazingira yako, na uko tayari — msingi tayari umeshakamilika.",
+      "get_started": "Fungua akaunti",
+      "sign_in": "Ingia"
+    }
+  },
+  "auth": {
+    "login_message": "Karibu tena",
+    "login_sub_message": "Ingia kwenye {{company}}",
+    "signup_message": "Fungua akaunti yako",
+    "signup_sub_message": "Jaza taarifa hapa chini kufungua akaunti yako",
+    "name": "Jina",
+    "email": "Barua pepe",
+    "password": "Nenosiri",
+    "confirm_password": "Thibitisha nenosiri",
+    "forgot_password": "Umesahau nenosiri lako?",
+    "have_no_account": "Huna akaunti?",
+    "have_account": "Una akaunti tayari?",
+    "signup": "Jisajili",
+    "login": "Ingia",
+    "terms_message": "Kwa kubofya endelea, unakubaliana na",
+    "social_login_message": "Au endelea na",
+    "logging": "Inaingia...",
+    "creating": "Inafungua Akaunti...",
+    "terms": "Masharti ya Huduma",
+    "policy": "Sera ya Faragha",
+    "passwords_no_match": "Manenosiri hayafanani",
+    "register_failed": "Usajili umeshindikana",
+    "email_verification_title": "Angalia barua pepe yako",
+    "email_verification_message": "Tumetuma kiungo cha uthibitisho kwenye anwani yako ya barua pepe. Tafadhali thibitisha akaunti yako kabla ya kuingia.",
+    "logout_message": "Umetoka kikamilifu.",
+    "continue_with_google": "Endelea na Google",
+    "oauth_failed": "Kuingia kumeshindikana",
+    "oauth_failed_message": "Hatukuweza kukamilisha kuingia kupitia mtoa huduma wako. Tafadhali jaribu tena."
+  },
+  "profile": {
+    "dashboard": "Dashibodi",
+    "logout": "Toka",
+    "notification": "Arifa",
+    "account": "Akaunti",
+    "my_profile": "Wasifu Wangu",
+    "session": "Vipindi",
+    "role": "Wajibu",
+    "permission": "Ruhusa",
+    "name": "Jina",
+    "first_name": "Jina la kwanza",
+    "last_name": "Jina la ukoo",
+    "email": "Barua pepe",
+    "avatar": "Picha Yangu",
+    "locale": "Mfumo wa Lugha Unaopendelewa",
+    "language": "Lugha",
+    "password": "Nenosiri",
+    "settings": "Mipangilio",
+    "loading_profile_text": "Inapakia Wasifu...",
+    "personal_profile": "Taarifa Binafsi",
+    "settings_message": "Simamia mipangilio na mapendeleo ya akaunti yako.",
+    "personal_profile_text": "Sasisha picha yako na taarifa zako binafsi hapa.",
+    "other_Settings": "Mipangilio Mingine",
+    "other_Settings_text": "Weka mapendeleo yako binafsi hapa"
+  },
+  "notification": {
+    "news_letter": "Jarida",
+    "news_letter_message": "Pokea taarifa za bidhaa, matangazo, na vidokezo kupitia barua pepe.",
+    "email_notification_message": "Pata arifa kuhusu shughuli za akaunti na tahadhari za usalama.",
+    "email_notification": "Arifa za Barua Pepe",
+    "push_notifiction": "Arifa za Papo kwa Papo",
+    "push_notifiction_message": "Pokea arifa za wakati halisi kwenye kivinjari chako.",
+    "notification_mesage": "Simamia jinsi unavyopokea masasisho na mawasiliano."
+  },
+  "password": {
+    "change_password_message": "Badilisha nenosiri lako ili kuweka akaunti yako salama.",
+    "current_password": "Nenosiri la Sasa",
+    "new_password": "Nenosiri Jipya",
+    "confirm_passsword": "Thibitisha Nenosiri",
+    "password_match_error": "Uthibitisho wa nenosiri haulingani"
+  },
+  "role_permission": {
+    "role_text": "Wajibu uliopewa unaamua kiwango chako cha msingi cha ufikiaji. Wajibu husimamiwa na wasimamizi.",
+    "permission_text": "Ruhusa zote ulizopewa — kutoka kwa wajibu wako na ruhusa zozote za moja kwa moja. Hizi ndizo huamua ni vitendo gani unavyoweza kufanya.",
+    "no_permission": "Hakuna Ruhusa Iliyowekwa",
+    "direct_permission": "Ruhusa za moja kwa moja (zaidi ya wajibu)"
+  },
+  "session": {
+    "session_text": "Simamia vipindi vyako vinavyoendelea. Batilisha kipindi chochote usichokitambua.",
+    "loading_sessions": "Inapakia vipindi...",
+    "active_sessions": "Vipindi Vinavyoendelea",
+    "no_sessions": "Hakuna vipindi vinavyoendelea",
+    "session_unkown_browser": "Kivinjari Kisichojulikana",
+    "revoke_session_message": "Kipindi Kimebatilishwa Kikamilifu"
+  },
+  "time": {
+    "justNow": "Sasa hivi",
+    "soon": "Hivi karibuni",
+    "minute_one": "Dakika {{count}} iliyopita",
+    "minute_other": "Dakika {{count}} zilizopita",
+    "hour_one": "Saa {{count}} iliyopita",
+    "hour_other": "Saa {{count}} zilizopita",
+    "day_one": "Siku {{count}} iliyopita",
+    "day_other": "Siku {{count}} zilizopita",
+    "month_one": "Mwezi {{count}} uliopita",
+    "month_other": "Miezi {{count}} iliyopita",
+    "year_one": "Mwaka {{count}} uliopita",
+    "year_other": "Miaka {{count}} iliyopita",
+    "in_minute_one": "baada ya dakika {{count}}",
+    "in_minute_other": "baada ya dakika {{count}}",
+    "in_hour_one": "baada ya saa {{count}}",
+    "in_hour_other": "baada ya saa {{count}}",
+    "in_day_one": "baada ya siku {{count}}",
+    "in_day_other": "baada ya siku {{count}}",
+    "in_month_one": "baada ya mwezi {{count}}",
+    "in_month_other": "baada ya miezi {{count}}",
+    "in_year_one": "baada ya mwaka {{count}}",
+    "in_year_other": "baada ya miaka {{count}}",
+    "invalid_date": "Tarehe Batili"
+  },
+  "rbac": {
+    "title": "Wajibu na Ruhusa",
+    "subtitle": "Simamia wajibu na uangalie kila ruhusa inayotolewa na mfumo",
+    "roles_tab": "Wajibu",
+    "permissions_tab": "Ruhusa",
+    "roles_text": "Wajibu hukusanya ruhusa na hupewa watumiaji",
+    "permissions_text": "Ruhusa zote zinazotolewa na mfumo, zimepangwa kwa kikundi",
+    "permissions_forbidden": "Huna ruhusa ya kuona orodha ya ruhusa",
+    "new_role": "Wajibu Mpya",
+    "edit_role": "Hariri Wajibu",
+    "delete_role": "Futa Wajibu",
+    "delete_role_confirm": "Hii itafuta kabisa wajibu \"{{name}}\". Watumiaji wenye wajibu huu watapoteza ruhusa zake.",
+    "role_dialog_text": "Weka jina la wajibu, maelezo na ruhusa unazotoa",
+    "name": "Jina",
+    "description": "Maelezo",
+    "status": "Hali",
+    "actions": "Vitendo",
+    "active": "Inatumika",
+    "inactive": "Haitumiki",
+    "delete": "Futa",
+    "no_roles": "Hakuna wajibu uliopatikana",
+    "no_permissions": "Hakuna ruhusa zilizopatikana",
+    "assign_role": "Weka Wajibu",
+    "assign_role_text": "Badilisha wajibu wa mtumiaji huyu",
+    "direct_permissions": "Ruhusa za Moja kwa Moja",
+    "direct_permissions_text": "Ruhusa za ziada juu ya zile za wajibu",
+    "effective_permissions": "Ruhusa Halisi",
+    "effective_permissions_text": "Kila kitu mtumiaji huyu anaweza kufanya — ruhusa za wajibu pamoja na za moja kwa moja"
+  },
+  "usersPage": {
+    "title": "Watumiaji",
+    "subtitle": "Simamia akaunti za watumiaji, wajibu na ruhusa zao",
+    "total": "Watumiaji {{count}} kwa jumla",
+    "name": "Jina",
+    "email": "Barua pepe",
+    "role": "Wajibu",
+    "status": "Hali",
+    "verified": "Imethibitishwa",
+    "unverified": "Haijathibitishwa",
+    "no_users": "Hakuna watumiaji waliopatikana",
+    "search_placeholder": "Tafuta kwa barua pepe...",
+    "delete_user": "Futa Mtumiaji",
+    "delete_user_confirm": "Hii itafuta kabisa {{name}} na haiwezi kurejeshwa.",
+    "details_title": "Taarifa za Akaunti",
+    "page_of": "Ukurasa {{page}} kati ya {{total}}",
+    "previous": "Iliyopita",
+    "next": "Ifuatayo"
+  },
+  "campaignsPage": {
+    "title": "Kampeni za Jarida",
+    "subtitle": "Andika, panga ratiba na tuma kampeni za barua pepe kwa waliojisajili kwenye jarida",
+    "total": "Kampeni {{count}} kwa jumla",
+    "new_campaign": "Kampeni Mpya",
+    "edit_campaign": "Hariri Kampeni",
+    "dialog_text": "Andika kichwa cha barua pepe pamoja na maudhui ya HTML na maandishi",
+    "subject": "Kichwa",
+    "body_html": "Maudhui ya HTML",
+    "body_text": "Maudhui ya Maandishi",
+    "status": "Hali",
+    "recipients": "Wapokeaji",
+    "scheduled_at": "Imepangwa",
+    "sent_at": "Imetumwa",
+    "no_campaigns": "Hakuna kampeni zilizopatikana",
+    "search_placeholder": "Tafuta kwa kichwa...",
+    "send_now": "Tuma Sasa",
+    "send_confirm": "Hii itatuma \"{{subject}}\" kwa kila aliyejisajili kwenye jarida.",
+    "schedule": "Panga Ratiba",
+    "schedule_text": "Chagua wakati \"{{subject}}\" itakapotumwa",
+    "delete_campaign": "Futa Kampeni",
+    "delete_confirm": "Hii itafuta kabisa kampeni \"{{subject}}\".",
+    "total_recipients": "Wapokeaji {{count}}",
+    "statuses": {
+      "draft": "Rasimu",
+      "scheduled": "Imepangwa",
+      "sending": "Inatumwa",
+      "sent": "Imetumwa",
+      "failed": "Imeshindikana"
+    }
+  },
+  "campaignDetails": {
+    "back_to_campaigns": "Rudi kwenye kampeni",
+    "content_title": "Maudhui",
+    "recipients_title": "Wapokeaji",
+    "recipient": "Mpokeaji",
+    "email": "Barua pepe",
+    "delivery_status": "Hali ya Utumaji",
+    "error": "Hitilafu",
+    "recipient_statuses": {
+      "pending": "Inasubiri",
+      "queued": "Kwenye Foleni",
+      "sent": "Imetumwa",
+      "failed": "Imeshindikana"
+    }
+  },
+  "subscribersPage": {
+    "title": "Waliojisajili kwenye Jarida",
+    "subtitle": "Kila mtu aliyejisajili kwenye jarida",
+    "total": "Waliojisajili {{count}} kwa jumla",
+    "name": "Jina",
+    "email": "Barua pepe",
+    "status": "Hali",
+    "subscribed_at": "Alijisajili",
+    "search_placeholder": "Tafuta kwa barua pepe..."
+  },
+  "visitorsPage": {
+    "title": "Uchambuzi wa Wageni",
+    "subtitle": "Muhtasari wa trafiki na kumbukumbu kamili ya kurasa zilizotazamwa",
+    "stats_tab": "Takwimu za Kila Siku",
+    "views_tab": "Kurasa Zilizotazamwa",
+    "stats_text": "Matazamo na wageni wa kipekee kwa kila ukurasa kwa siku",
+    "views_text": "Matazamo {{count}} yamerekodiwa",
+    "date": "Tarehe",
+    "time": "Muda",
+    "path": "Ukurasa",
+    "views": "Matazamo",
+    "unique_visitors": "Wageni wa Kipekee",
+    "referrer": "Chanzo",
+    "country": "Nchi",
+    "visitor": "Mgeni",
+    "registered": "Aliyesajiliwa",
+    "anonymous": "Asiyejulikana",
+    "no_data": "Hakuna taarifa bado",
+    "search_placeholder": "Tafuta kwa ukurasa..."
+  },
+  "dataTable": {
+    "search": "Tafuta...",
+    "clear": "Ondoa",
+    "all_option": "Zote — {{label}}",
+    "results_one": "Tokeo {{count}}",
+    "results_other": "Matokeo {{count}}",
+    "no_results": "Hakuna matokeo yaliyopatikana",
+    "rows_per_page": "Safu kwa ukurasa"
+  },
+  "actions": {
+    "save": "Hifadhi Mabadiliko",
+    "saving": "Inahifadhi...",
+    "send": "Tuma",
+    "sending": "Inatuma...",
+    "cancel": "Ghairi",
+    "upload": "Pakia",
+    "click_to_upload": "Bofya Kupakia",
+    "uploading": "Inapakia...",
+    "loading": "Inapakia...",
+    "update": "Sasisha",
+    "updating": "Inasasisha..."
+  },
+  "footer": {
+    "maker_message": "{{year}} Imejengwa na {{company}}",
+    "right_reserved_message": "Haki zote zimehifadhiwa",
+    "newsletter_subscription": "Jiandikishe kwa jarida letu"
+  },
+  "dashboards": {
+    "navMain": {
+      "title": "Jukwaa",
+      "dashboard": {
+        "title": "Dashibodi",
+        "home": "Nyumbani",
+        "users": "Watumiaji",
+        "history": "Historia",
+        "analytics": "Uchambuzi"
+      },
+      "settings": {
+        "title": "Mipangilio",
+        "system_settings": "Mipangilio ya Mfumo",
+        "my_account": "Akaunti Yangu"
+      },
+      "role_permissions": {
+        "title": "Wajibu na Ruhusa",
+        "roles": "Wajibu",
+        "permissions": "Ruhusa"
+      },
+      "newsletter": {
+        "title": "Jarida",
+        "campaigns": "Kampeni",
+        "subscribers": "Waliojisajili",
+        "visitors": "Uchambuzi wa Wageni"
+      }
+    },
+    "subMain": {
+      "title": "Idara",
+      "action": {
+        "view": "Tazama",
+        "save": "Hifadhi",
+        "delete": "Futa"
+      },
+      "multimedia": "Multimedia",
+      "software": "Programu",
+      "design": "Muundo wa Michoro"
+    }
+  },
+  "notifications": {
+    "title": "Arifa",
+    "aria_label": "Fungua arifa",
+    "mark_all_read": "Weka zote zimesomwa",
+    "empty": "Hakuna arifa bado",
+    "welcome_title": "Karibu, {{firstName}}!",
+    "welcome_message": "Akaunti yako imethibitishwa na iko tayari kutumika.",
+    "campaign_sent_title": "Kampeni imetumwa",
+    "campaign_sent_message": "\"{{subject}}\" imewasilishwa kwa wanachama wako.",
+    "campaign_failed_title": "Kampeni imeshindikana",
+    "campaign_failed_message": "\"{{subject}}\" haikuweza kutumwa. Kagua kampeni na ujaribu tena."
+  },
+  "validation": {
+    "required": "Sehemu hii inahitajika",
+    "email": "Weka anwani sahihi ya barua pepe",
+    "password_min": "Nenosiri lazima liwe na angalau herufi {{count}}"
+  }
+}
