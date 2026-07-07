@@ -135,6 +135,27 @@ Vitest runs two kinds of tests:
 
 The chunk-splitting config in `vite.config.ts` separates the heaviest stable vendors (react, motion, i18n, charts) so app-code changes don't invalidate the whole vendor download. `RouterErrorBoundary` already handles the stale-chunk-after-redeploy case with a reload prompt.
 
+## Keeping your project up to date
+
+Projects created from this template have **no automatic link back to it** — you own a divergent copy. Three ways to pull in template improvements, from manual to automated:
+
+1. **Follow the releases.** Each [release](https://github.com/JayrousJr/frontend-with-react/releases) describes what changed and how to apply it to an existing project. Commits are small and conventional, so individual changes are easy to cherry-pick by hand.
+
+2. **Template remote** (best adopted right after scaffolding, degrades as you diverge):
+
+   ```bash
+   git remote add template git@github.com:JayrousJr/frontend-with-react.git
+   # when the template releases updates:
+   git fetch template
+   git merge template/main --allow-unrelated-histories
+   ```
+
+   Files you never touched merge cleanly; files you customized raise conflicts to resolve deliberately.
+
+3. **Automated sync PRs** — install [`actions-template-sync`](https://github.com/AndreasAugustin/actions-template-sync) in your project and template changes arrive as reviewable pull requests on a schedule.
+
+After significant divergence, most projects stop syncing wholesale and instead read the template's release diffs for ideas — that's expected and fine.
+
 ## Before you ship this
 
 A few things in the template are placeholder content and should be replaced or removed before a real release:
