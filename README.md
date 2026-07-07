@@ -13,6 +13,24 @@ A React 19 + Vite + TypeScript frontend template built for **security, RBAC, and
 ## Getting started
 
 ```bash
+git clone <repo-url> my-app
+cd my-app
+
+# Run the setup script — it will:
+#   - Remove template .git history and init a fresh repo
+#   - Rename the project in package.json and index.html
+#   - Create .env pointing at your backend URL
+#   - Install dependencies, create an initial commit, and remove itself
+bash setup.sh
+
+pnpm dev
+```
+
+### Manual setup (if you prefer)
+
+```bash
+rm -rf .git && git init
+# Rename "frontend-react-template" in package.json and titles in index.html
 pnpm install
 cp .env.example .env
 pnpm dev
