@@ -114,8 +114,18 @@ Vitest runs two kinds of tests:
 
 `pnpm build` outputs a static SPA to `dist/`. Because routing uses `createBrowserRouter`, the server **must rewrite unknown paths to `index.html`** or every deep link and page refresh 404s:
 
+- **Docker (included)** — the `Dockerfile` builds the app and serves it with nginx (`nginx.conf` has the SPA fallback, gzip, and immutable caching for hashed assets). Vite env vars are baked in at **build time**, so pass them as build args:
+
+  ```bash
+  docker build \
+    --build-arg VITE_API_URL=https://api.example.com/api \
+    --build-arg VITE_GRAPHQL_URL=https://api.example.com/api/graphql \
+    -t my-frontend .
+  docker run -p 8080:80 my-frontend
+  ```
+
 - **Netlify / Vercel / Cloudflare Pages** — handled by their SPA preset (or a one-line `_redirects` / `vercel.json` rewrite).
-- **nginx**:
+- **nginx (bare)** — see `nginx.conf` in the repo root for the full config; the essential line:
 
   ```nginx
   location / {
