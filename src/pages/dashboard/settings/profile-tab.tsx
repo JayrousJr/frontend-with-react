@@ -17,9 +17,11 @@ import {
   fetchMyProfile,
   updateProfile,
   uploadAvatar,
+  MAX_UPLOAD_SIZE,
   type Profile,
 } from "@/services/account"
-import { UploadIcon } from "lucide-react"
+import { FileUpload, type UploadHandlerOptions } from "@/components/file-upload"
+import { formatFileSize } from "@/lib/format"
 import { useTranslation } from "react-i18next"
 import LanguageSwitcher from "@/components/languageSwitcher"
 import { toast } from "sonner"
@@ -54,21 +56,24 @@ const ProfileTab = () => {
     void load()
   }, [t])
 
-  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file || !profile) return
+  // Throwing here surfaces the message on the attachment card itself, so the
+  // failed file stays visible with a retry action instead of vanishing.
+  async function handleAvatarUpload(
+    file: File,
+    { onProgress, signal }: UploadHandlerOptions
+  ) {
+    if (!profile) return
 
-    try {
-      const { uniqueId: avatarUniqueId } = await uploadAvatar(file)
-      const res = await updateProfile({
-        uniqueId: profile.uniqueId,
-        avatarUniqueId,
-      })
-      await refreshUser()
-      toast.success(res.updateUser.message)
-    } catch {
-      toast.error(`${t("general_error")}`)
-    }
+    const { uniqueId: avatarUniqueId } = await uploadAvatar(file, {
+      onProgress,
+      signal,
+    })
+    const res = await updateProfile({
+      uniqueId: profile.uniqueId,
+      avatarUniqueId,
+    })
+    await refreshUser()
+    toast.success(res.updateUser.message)
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -187,19 +192,16 @@ const ProfileTab = () => {
                       {initials}
                     </AvatarFallback>
                   </Avatar>
-                  <label className="flex cursor-pointer flex-col items-center gap-1 rounded-lg border border-dashed px-6 py-4 text-sm text-muted-foreground transition-colors hover:border-foreground/50 hover:text-foreground">
-                    <UploadIcon className="size-5" />
-                    <span> {t("actions.click_to_upload")}</span>
-                    <span className="text-xs">
-                      SVG, PNG or JPG (max. 800x400px)
-                    </span>
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleAvatarUpload}
-                    />
-                  </label>
+                  <FileUpload
+                    accept="image/*"
+                    maxSize={MAX_UPLOAD_SIZE}
+                    onUpload={handleAvatarUpload}
+                    label={t("actions.click_to_upload")}
+                    description={t("upload.image_hint", {
+                      size: formatFileSize(MAX_UPLOAD_SIZE),
+                    })}
+                    className="flex-1"
+                  />
                 </div>
 
                 <Separator className="col-span-2" />

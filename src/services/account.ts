@@ -130,13 +130,31 @@ export async function unsubscribeFromNewsletter(): Promise<Subscription> {
   return await gql(UNSUBSCRIBE_FROM_NEWSLETTER)
 }
 
-export async function uploadAvatar(file: File): Promise<{ uniqueId: string }> {
+/** Matches the backend's MAX_FILE_SIZE (storage.constants.ts) so the client
+ *  rejects oversized files before spending an upload on them. */
+export const MAX_UPLOAD_SIZE = 10 * 1024 * 1024
+
+export async function uploadAvatar(
+  file: File,
+  options?: {
+    /** Receives 0–100 as the body uploads. */
+    onProgress?: (percent: number) => void
+    signal?: AbortSignal
+  }
+): Promise<{ uniqueId: string }> {
   const formData = new FormData()
   formData.append("file", file)
   formData.append("folder", "images/profiles")
   const { data } = await api.post<{ data: { uniqueId: string } }>(
     "/files/upload",
-    formData
+    formData,
+    {
+      signal: options?.signal,
+      onUploadProgress: (event) => {
+        if (!options?.onProgress || !event.total) return
+        options.onProgress(Math.round((event.loaded * 100) / event.total))
+      },
+    }
   )
   return data.data
 }

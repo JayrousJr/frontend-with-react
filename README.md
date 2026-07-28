@@ -113,6 +113,29 @@ Forms use **react-hook-form + zod**, wired to the shadcn `Field` primitives — 
 3. **Backend errors** go to the form's root error via `setRootError(form.setError, err, fallback)` (`src/lib/form.ts`), rendered with `<FieldError errors={[form.formState.errors.root]} />` — backend messages arrive already localized via the `x-lang` header, so they're shown verbatim.
 4. `form.formState.isSubmitting` drives the submit button's disabled/loading state — no manual `useState` bookkeeping.
 
+## File uploads
+
+`FileUpload` (`src/components/file-upload.tsx`) is the standard uploader, built on the `Attachment` primitives (`components/ui/attachment.tsx`): a dashed drop zone plus one attachment card per file. `settings/profile-tab.tsx` is the reference usage.
+
+```tsx
+<FileUpload
+  accept="image/*"
+  maxSize={MAX_UPLOAD_SIZE}
+  onUpload={async (file, { onProgress, signal }) => {
+    await uploadAvatar(file, { onProgress, signal })
+  }}
+/>
+```
+
+What it handles for you:
+
+- **Real progress** — the `onProgress` callback is wired to axios `onUploadProgress`, so the card shows actual percentages, not a fake bar.
+- **Cancellation** — the `signal` is an `AbortSignal`; forward it to axios and the ✕ on an in-flight upload genuinely aborts the request.
+- **Inline errors with retry** — throw from `onUpload` and the card flips to the error state showing the thrown message (backend messages are already localized via `x-lang`), with a retry action. Size and type violations fail locally without spending a request.
+- **Image previews** — image files render a thumbnail that dims while uploading and brightens when done.
+
+Keep `maxSize` aligned with the backend's `MAX_FILE_SIZE` (`storage.constants.ts`) — `MAX_UPLOAD_SIZE` in `src/services/account.ts` mirrors it.
+
 ## Real-time notifications
 
 `NotificationBell` (in the dashboard header) shows a badge with the unread count and a popover list. It connects to the backend's Socket.io gateway (`src/lib/socket.ts` — singleton, JWT handshake) and prepends + toasts incoming `notification` events live. Notification content arrives as i18n keys plus JSON-encoded params (`titleKey` / `messageKey` / `params`), rendered with the user's current locale — new notification kinds only need translation entries under `notifications.*` in each locale file. The socket requires a JWT access token, so under the `"session"` auth strategy the bell degrades gracefully to fetch-on-load without live pushes.

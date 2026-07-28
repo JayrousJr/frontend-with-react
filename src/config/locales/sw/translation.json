@@ -364,5 +364,16 @@
     "required": "Sehemu hii inahitajika",
     "email": "Weka anwani sahihi ya barua pepe",
     "password_min": "Nenosiri lazima liwe na angalau herufi {{count}}"
+  },
+  "upload": {
+    "hint": "Bofya kupakia au buruta na uachie",
+    "image_hint": "SVG, PNG au JPG · kikomo {{size}}",
+    "uploading_percent": "Inapakia · {{percent}}%",
+    "failed": "Upakiaji umeshindikana",
+    "too_large": "Faili ni kubwa kuliko {{size}}",
+    "invalid_type": "Aina ya faili haikubaliki",
+    "remove": "Ondoa faili",
+    "cancel": "Ghairi upakiaji",
+    "retry": "Jaribu tena kupakia"
   }
 }

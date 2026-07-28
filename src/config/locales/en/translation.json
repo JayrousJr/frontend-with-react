@@ -364,5 +364,16 @@
     "required": "This field is required",
     "email": "Enter a valid email address",
     "password_min": "Password must be at least {{count}} characters"
+  },
+  "upload": {
+    "hint": "Click to upload or drag and drop",
+    "image_hint": "SVG, PNG or JPG · max {{size}}",
+    "uploading_percent": "Uploading · {{percent}}%",
+    "failed": "Upload failed",
+    "too_large": "File is larger than {{size}}",
+    "invalid_type": "Unsupported file type",
+    "remove": "Remove file",
+    "cancel": "Cancel upload",
+    "retry": "Retry upload"
   }
 }
