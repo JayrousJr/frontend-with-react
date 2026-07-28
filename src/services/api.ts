@@ -17,18 +17,22 @@ export const graphql = axios.create({
 
 const AUTH_STRATEGY = import.meta.env.VITE_AUTH_STRATEGY
 
+/**
+ * The access token is kept in memory only — never localStorage — so an XSS
+ * cannot read it, and it dies with the tab. The refresh token is never visible
+ * to JavaScript at all: the backend sets it as an HttpOnly cookie, which the
+ * browser replays automatically on `POST /auth/refresh` (hence
+ * `withCredentials` above). On reload, AuthProvider trades that cookie for a
+ * fresh access token.
+ */
+let accessToken: string | null = null
+
 export function setAccessToken(token: string) {
-  if (token) localStorage.setItem("accessToken", token)
-  else localStorage.removeItem("accessToken")
+  accessToken = token || null
 }
 
-export function setRefreshToken(token: string) {
-  if (token) localStorage.setItem("refreshToken", token)
-  else localStorage.removeItem("refreshToken")
-}
-
-export function getRefreshToken() {
-  return localStorage.getItem("refreshToken")
+export function getAccessToken() {
+  return accessToken
 }
 
 // Attach auth + active locale (backend localizes errors, emails and
@@ -36,7 +40,6 @@ export function getRefreshToken() {
 function withCredentialsAndLocale(
   config: import("axios").InternalAxiosRequestConfig
 ) {
-  const accessToken = localStorage.getItem("accessToken")
   if (AUTH_STRATEGY !== "session" && accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`
   }

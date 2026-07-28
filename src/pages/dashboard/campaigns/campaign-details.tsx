@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify"
 import { useEffect, useState } from "react"
 import { Link, useLoaderData, useParams } from "react-router"
 import { useTranslation } from "react-i18next"
@@ -182,9 +183,14 @@ const CampaignDetailsPage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Campaign bodies are user-authored HTML — sanitize before
+              rendering, or a campaign author could run script in an admin's
+              session (and read their in-memory access token). */}
           <div
             className="prose max-w-none text-sm"
-            dangerouslySetInnerHTML={{ __html: campaign.bodyHtml }}
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(campaign.bodyHtml),
+            }}
           />
         </CardContent>
       </Card>

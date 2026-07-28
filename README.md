@@ -92,7 +92,9 @@ The **admin role bypasses every permission check**, mirroring the backend's `Per
 `AuthProvider` validates the session once on mount, branching on `VITE_AUTH_STRATEGY`:
 
 - `"session"` — `GET /auth/me` with cookies
-- `"jwt"` — `POST /auth/refresh` with the stored refresh token, then persists both tokens to localStorage (a deliberate tradeoff so sessions survive reloads)
+- `"jwt"` — `POST /auth/refresh`, which the browser authenticates with an **HttpOnly refresh-token cookie** the backend set at login
+
+**Token storage:** the access token is held **in memory only** (`src/services/api.ts`) and the refresh token is an `HttpOnly; SameSite=Strict` cookie, so neither is reachable from JavaScript — an XSS cannot exfiltrate a long-lived credential. A page reload has no token in memory, so `AuthProvider` trades the cookie for a fresh access token on mount. Anything rendering user-authored HTML must still be sanitized (see `campaign-details.tsx`, which runs `DOMPurify.sanitize`).
 
 `useAuth()` exposes `{ isLoading, isAuthenticated, user, login, logout, refreshUser }`. `AuthProvider` is also the single owner of locale sync — it applies `user.preferredLocale` to i18next and persists it, so a user's language preference follows them across devices once they're logged in.
 

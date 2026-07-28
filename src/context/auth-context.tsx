@@ -1,11 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import * as React from "react"
-import {
-  api,
-  setAccessToken,
-  setRefreshToken,
-  getRefreshToken,
-} from "@/services/api"
+import { api, setAccessToken } from "@/services/api"
 import { disconnectSocket } from "@/lib/socket"
 import { fetchMe } from "@/services/auth"
 import i18next from "i18next"
@@ -33,7 +28,7 @@ type AuthContextValue = {
   isLoading: boolean
   isAuthenticated: boolean
   user: User | null
-  login: (accessToken: string, refreshToken: string) => Promise<void>
+  login: (accessToken: string) => Promise<void>
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
 }
@@ -61,14 +56,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           await api.get("/auth/me")
           setUser(await fetchMe())
         } else {
-          const stored = getRefreshToken()
-          if (!stored) return
-          const { data } = await api.post<{
-            accessToken: string
-            refreshToken: string
-          }>("/auth/refresh", { refreshToken: stored })
+          // The refresh token is an HttpOnly cookie the browser attaches
+          // itself — there is nothing to read or send from JS. A 401 here
+          // simply means no (or an expired) session.
+          const { data } = await api.post<{ accessToken: string }>(
+            "/auth/refresh"
+          )
           setAccessToken(data.accessToken)
-          setRefreshToken(data.refreshToken)
           setUser(await fetchMe())
         }
       } catch {
@@ -81,20 +75,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     void validateSession()
   }, [])
 
-  const login = React.useCallback(
-    async (accessToken: string, refreshToken: string) => {
-      setAccessToken(accessToken)
-      setRefreshToken(refreshToken)
-      setUser(await fetchMe())
-    },
-    []
-  )
+  const login = React.useCallback(async (accessToken: string) => {
+    setAccessToken(accessToken)
+    setUser(await fetchMe())
+  }, [])
 
   const logout = React.useCallback(async () => {
-    const stored = getRefreshToken()
-    if (stored) await api.post("/auth/logout", { refreshToken: stored })
+    // The cookie identifies the session; the backend revokes it and clears it.
+    try {
+      await api.post("/auth/logout")
+    } catch {
+      // Logout is best-effort — always drop local state below.
+    }
     setAccessToken("")
-    setRefreshToken("")
     disconnectSocket()
     setUser(null)
   }, [])

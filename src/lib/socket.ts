@@ -1,5 +1,6 @@
 import { io, type Socket } from "socket.io-client"
 import { API_URL } from "./api-url"
+import { getAccessToken } from "@/services/api"
 
 /**
  * Singleton socket.io connection to the backend EventsGateway (`/ws`
@@ -10,7 +11,7 @@ import { API_URL } from "./api-url"
 let socket: Socket | null = null
 
 export function connectSocket(): Socket | null {
-  const token = localStorage.getItem("accessToken")
+  const token = getAccessToken()
   if (!token) return null
 
   if (socket) return socket
