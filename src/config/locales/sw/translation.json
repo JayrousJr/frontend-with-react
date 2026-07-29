@@ -375,5 +375,10 @@
     "remove": "Ondoa faili",
     "cancel": "Ghairi upakiaji",
     "retry": "Jaribu tena kupakia"
+  },
+  "blog": {
+    "title": "Blogu",
+    "subtitle": "Makala na masasisho ya hivi karibuni.",
+    "empty": "Hakuna machapisho bado."
   }
 }

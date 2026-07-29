@@ -1,0 +1,14 @@
+# Static fallback. In production prefer proxying /robots.txt and /sitemap.xml
+# to the API (see nginx.conf) so the sitemap reflects live content.
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /users
+Disallow: /roles
+Disallow: /campaigns
+Disallow: /subscribers
+Disallow: /visitors
+Disallow: /auth/
+
+Sitemap: /sitemap.xml

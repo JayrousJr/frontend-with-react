@@ -375,5 +375,10 @@
     "remove": "Remove file",
     "cancel": "Cancel upload",
     "retry": "Retry upload"
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Latest articles and updates.",
+    "empty": "No posts published yet."
   }
 }

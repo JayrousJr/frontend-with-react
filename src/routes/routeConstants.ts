@@ -8,6 +8,8 @@ export const ROUTES = {
 
   // Dashboards
   HOME: "/",
+  BLOG: "/blog",
+  BLOG_POST: "/blog/:slug",
   DASHBOARD: "/dashboard",
   USERS: "/users",
   USER_DETAILS: "/users/:uniqueId",

@@ -276,3 +276,30 @@ mutation MarkAllNotificationsRead {
     message
   }
 }`
+
+//  Content (SEO / blog)
+
+export const CREATE_POST = `
+mutation CreatePost($input: CreatePostInput!) {
+  createPost(input: $input) { data { uniqueId slug } message }
+}`
+
+export const UPDATE_POST = `
+mutation UpdatePost($input: UpdatePostInput!) {
+  updatePost(input: $input) { data { uniqueId slug } message }
+}`
+
+export const DELETE_POST = `
+mutation DeletePost($uniqueId: String!) {
+  deletePost(uniqueId: $uniqueId) { message }
+}`
+
+export const CREATE_REDIRECT = `
+mutation CreateRedirect($input: CreateRedirectInput!) {
+  createRedirect(input: $input) { data { uniqueId fromPath toPath } message }
+}`
+
+export const DELETE_REDIRECT = `
+mutation DeleteRedirect($uniqueId: String!) {
+  deleteRedirect(uniqueId: $uniqueId) { message }
+}`
