@@ -19,7 +19,13 @@ import {
 } from "@/services/campaigns"
 import { fetchPageViews, fetchVisitorStats } from "@/services/analytics"
 import { fetchNewsletterSubscribers } from "@/services/newsletter"
-import { fetchPostBySlug, fetchPublishedPosts } from "@/services/content"
+import {
+  fetchPost,
+  fetchPostBySlug,
+  fetchPosts,
+  fetchPublishedPosts,
+  fetchRedirects,
+} from "@/services/content"
 import { articleJsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/seo"
 import type { Post } from "@/services/content"
 import { PERMISSIONS } from "@/lib/permissions"
@@ -292,6 +298,57 @@ export const routes = createBrowserRouter([
                   lazyPage(
                     () => import("@/pages/dashboard/subscribers/subscribers")
                   ),
+              },
+            ],
+          },
+
+          /** Permission-gated: SEO content (backend requires content.read) */
+          {
+            element: (
+              <PermissionRoute
+                requiredPermissions={[PERMISSIONS.CONTENT.READ]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.POSTS,
+                loader: async ({ request }) => {
+                  const params = new URL(request.url).searchParams
+                  return {
+                    posts: await fetchPosts(
+                      {
+                        page: Number(params.get("page") ?? "1"),
+                        limit: Number(params.get("limit") ?? "10"),
+                      },
+                      { search: params.get("q") || undefined }
+                    ),
+                  }
+                },
+                lazy: () =>
+                  lazyPage(() => import("@/pages/dashboard/content/posts")),
+              },
+              {
+                path: ROUTES.POST_NEW,
+                lazy: () =>
+                  lazyPage(
+                    () => import("@/pages/dashboard/content/post-editor")
+                  ),
+              },
+              {
+                path: ROUTES.POST_EDIT,
+                loader: async ({ params }) => ({
+                  post: await fetchPost(params.uniqueId!),
+                }),
+                lazy: () =>
+                  lazyPage(
+                    () => import("@/pages/dashboard/content/post-editor")
+                  ),
+              },
+              {
+                path: ROUTES.REDIRECTS,
+                loader: async () => ({ redirects: await fetchRedirects() }),
+                lazy: () =>
+                  lazyPage(() => import("@/pages/dashboard/content/redirects")),
               },
             ],
           },

@@ -298,6 +298,26 @@ export const navMain: NavMainItem[] = [
     ],
   },
   {
+    id: "content",
+    title: () => t("dashboards.navMain.content.title"),
+    url: "#",
+    icon: ScrollText,
+    items: [
+      {
+        id: "content-posts",
+        title: () => t("dashboards.navMain.content.posts"),
+        url: ROUTES.POSTS,
+        requiredPermissions: [PERMISSIONS.CONTENT.READ],
+      },
+      {
+        id: "content-redirects",
+        title: () => t("dashboards.navMain.content.redirects"),
+        url: ROUTES.REDIRECTS,
+        requiredPermissions: [PERMISSIONS.SEO.MANAGE],
+      },
+    ],
+  },
+  {
     id: "role-permissions",
     title: () => t("dashboards.navMain.role_permissions.title"),
     url: "#",

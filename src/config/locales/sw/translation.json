@@ -334,6 +334,11 @@
         "campaigns": "Kampeni",
         "subscribers": "Waliojisajili",
         "visitors": "Uchambuzi wa Wageni"
+      },
+      "content": {
+        "title": "Maudhui",
+        "posts": "Machapisho",
+        "redirects": "Uelekezaji"
       }
     },
     "subMain": {
@@ -380,5 +385,45 @@
     "title": "Blogu",
     "subtitle": "Makala na masasisho ya hivi karibuni.",
     "empty": "Hakuna machapisho bado."
+  },
+  "content": {
+    "title": "Maudhui",
+    "subtitle": "Machapisho yanayoonekana hadharani na kuorodheshwa na injini za utafutaji.",
+    "new_post": "Chapisho jipya",
+    "edit_post": "Hariri chapisho",
+    "editor_hint": "HTML ya maudhui husafishwa wakati wa kuhifadhi.",
+    "excerpt": "Muhtasari",
+    "body": "Maudhui (HTML)",
+    "save_draft": "Hifadhi rasimu",
+    "publish": "Chapisha",
+    "seo_panel": "Muonekano wa utafutaji",
+    "seo_hint": "Jinsi ukurasa huu unavyoonekana kwenye matokeo. Sehemu tupu hutumia kichwa na muhtasari.",
+    "meta_title": "Kichwa cha meta",
+    "meta_description": "Maelezo ya meta",
+    "canonical": "URL ya kanuni",
+    "canonical_hint": "Acha wazi isipokuwa ukurasa huu unarudia mwingine",
+    "noindex": "haiorodheshwi",
+    "noindex_label": "Usiorodheshe kwenye injini za utafutaji",
+    "untitled": "Bila kichwa",
+    "no_description": "Hakuna maelezo bado",
+    "slug_hint": "Hutengenezwa kutoka kichwa ikiwa wazi",
+    "search_placeholder": "Tafuta machapisho…",
+    "columns": {
+      "title": "Kichwa",
+      "slug": "Kitambulisho",
+      "status": "Hali",
+      "locale": "Lugha",
+      "published": "Ilichapishwa"
+    }
+  },
+  "redirects": {
+    "title": "Uelekezaji",
+    "subtitle": "301 ili URL zilizobadilishwa zibaki na nafasi yake. Mabadiliko ya kitambulisho huongeza haya kiotomatiki.",
+    "from": "Kutoka njia",
+    "to": "Kwenda njia",
+    "hits": "Matumizi",
+    "add": "Ongeza uelekezaji",
+    "delete": "Futa",
+    "empty": "Hakuna uelekezaji bado"
   }
 }

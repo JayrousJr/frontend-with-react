@@ -334,6 +334,11 @@
         "campaigns": "Campaigns",
         "subscribers": "Subscribers",
         "visitors": "Visitor Analytics"
+      },
+      "content": {
+        "title": "Content",
+        "posts": "Posts",
+        "redirects": "Redirects"
       }
     },
     "subMain": {
@@ -380,5 +385,45 @@
     "title": "Blog",
     "subtitle": "Latest articles and updates.",
     "empty": "No posts published yet."
+  },
+  "content": {
+    "title": "Content",
+    "subtitle": "Posts published to the public site and indexed by search engines.",
+    "new_post": "New post",
+    "edit_post": "Edit post",
+    "editor_hint": "Body HTML is sanitized on save.",
+    "excerpt": "Excerpt",
+    "body": "Body (HTML)",
+    "save_draft": "Save draft",
+    "publish": "Publish",
+    "seo_panel": "Search appearance",
+    "seo_hint": "How this page looks in results. Empty fields fall back to the title and excerpt.",
+    "meta_title": "Meta title",
+    "meta_description": "Meta description",
+    "canonical": "Canonical URL",
+    "canonical_hint": "Leave empty unless this duplicates another page",
+    "noindex": "noindex",
+    "noindex_label": "Exclude from search engines (noindex)",
+    "untitled": "Untitled",
+    "no_description": "No description yet",
+    "slug_hint": "Generated from the title when empty",
+    "search_placeholder": "Search posts…",
+    "columns": {
+      "title": "Title",
+      "slug": "Slug",
+      "status": "Status",
+      "locale": "Locale",
+      "published": "Published"
+    }
+  },
+  "redirects": {
+    "title": "Redirects",
+    "subtitle": "301s so renamed URLs keep the ranking they earned. Slug changes add these automatically.",
+    "from": "From path",
+    "to": "To path",
+    "hits": "Hits",
+    "add": "Add redirect",
+    "delete": "Delete",
+    "empty": "No redirects yet"
   }
 }
