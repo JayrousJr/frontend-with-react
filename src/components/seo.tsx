@@ -1,13 +1,54 @@
+import { useEffect } from "react"
 import { useLocation, useMatches } from "react-router"
 import { useTranslation } from "react-i18next"
 import { absoluteUrl, pageTitle, type SeoHandle, type SeoMeta } from "@/lib/seo"
 import { APP_NAME } from "@/lib/exports"
 
 /**
- * Renders document metadata. React 19 hoists <title>, <meta> and <link> to
- * <head> automatically, so no helmet library is needed — but note this all
- * happens client-side: crawlers that don't execute JS (every social preview
- * bot) only see it on prerendered routes. See `scripts/prerender.mjs`.
+ * Marks every tag this component owns, so a re-render can replace the whole
+ * set instead of accumulating duplicates.
+ */
+const OWNED = "data-seo"
+
+function upsertMeta(key: "name" | "property", value: string, content?: string) {
+  const selector = `meta[${key}="${value}"]`
+  const existing = document.head.querySelector<HTMLMetaElement>(selector)
+  if (!content) {
+    existing?.remove()
+    return
+  }
+  const tag = existing ?? document.createElement("meta")
+  tag.setAttribute(key, value)
+  tag.setAttribute("content", content)
+  tag.setAttribute(OWNED, "")
+  if (!existing) document.head.appendChild(tag)
+}
+
+function upsertCanonical(href: string) {
+  const existing = document.head.querySelector<HTMLLinkElement>(
+    'link[rel="canonical"]'
+  )
+  const tag = existing ?? document.createElement("link")
+  tag.setAttribute("rel", "canonical")
+  tag.setAttribute("href", href)
+  tag.setAttribute(OWNED, "")
+  if (!existing) document.head.appendChild(tag)
+}
+
+/** Alternates and JSON-LD are sets, so they are cleared and rebuilt together. */
+function replaceAll(selector: string, build: () => HTMLElement[]) {
+  document.head.querySelectorAll(selector).forEach((node) => node.remove())
+  for (const node of build()) document.head.appendChild(node)
+}
+
+/**
+ * Applies document metadata for the current page.
+ *
+ * Tags are written imperatively rather than rendered as JSX: React 19 hoists
+ * <title>/<meta> automatically, but lazy routes suspend and remount, which
+ * leaves the previous hoisted tags behind — a production build ended up with
+ * four <title> elements. Upserting by selector guarantees exactly one of each
+ * in dev, in the bundle, and in the prerendered HTML.
  */
 export function Seo({
   title,
@@ -24,72 +65,92 @@ export function Seo({
   const { pathname } = useLocation()
   const { i18n } = useTranslation()
 
+  const resolvedTitle = pageTitle(title)
   const url = absoluteUrl(canonical ?? pathname)
   const imageUrl = absoluteUrl(image)
   const structured = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []
+  const serializedStructured = JSON.stringify(structured)
+  const serializedAlternates = JSON.stringify(alternates ?? [])
 
-  return (
-    <>
-      <title>{pageTitle(title)}</title>
-      {description && <meta name="description" content={description} />}
-      <link rel="canonical" href={url} />
-      {noindex ? (
-        <meta name="robots" content="noindex, nofollow" />
-      ) : (
-        <meta name="robots" content="index, follow" />
-      )}
+  useEffect(() => {
+    document.title = resolvedTitle
 
-      {alternates?.map((alt) => (
-        <link
-          key={alt.locale}
-          rel="alternate"
-          hrefLang={alt.locale}
-          href={absoluteUrl(alt.path)}
-        />
-      ))}
-      {alternates && alternates.length > 0 && (
-        <link
-          rel="alternate"
-          hrefLang="x-default"
-          href={absoluteUrl(alternates[0].path)}
-        />
-      )}
+    upsertMeta("name", "description", description)
+    upsertMeta(
+      "name",
+      "robots",
+      noindex ? "noindex, nofollow" : "index, follow"
+    )
 
-      <meta property="og:type" content={type} />
-      <meta property="og:site_name" content={APP_NAME} />
-      <meta property="og:title" content={pageTitle(title)} />
-      {description && <meta property="og:description" content={description} />}
-      <meta property="og:url" content={url} />
-      <meta property="og:image" content={imageUrl} />
-      <meta property="og:locale" content={i18n.language} />
-      {publishedAt && (
-        <meta property="article:published_time" content={publishedAt} />
-      )}
-      {modifiedAt && (
-        <meta property="article:modified_time" content={modifiedAt} />
-      )}
+    upsertMeta("property", "og:type", type)
+    upsertMeta("property", "og:site_name", APP_NAME)
+    upsertMeta("property", "og:title", resolvedTitle)
+    upsertMeta("property", "og:description", description)
+    upsertMeta("property", "og:url", url)
+    upsertMeta("property", "og:image", imageUrl)
+    upsertMeta("property", "og:locale", i18n.language)
+    upsertMeta("property", "article:published_time", publishedAt)
+    upsertMeta("property", "article:modified_time", modifiedAt)
 
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={pageTitle(title)} />
-      {description && <meta name="twitter:description" content={description} />}
-      <meta name="twitter:image" content={imageUrl} />
+    upsertMeta("name", "twitter:card", "summary_large_image")
+    upsertMeta("name", "twitter:title", resolvedTitle)
+    upsertMeta("name", "twitter:description", description)
+    upsertMeta("name", "twitter:image", imageUrl)
 
-      {structured.map((entry, index) => (
-        <script
-          key={index}
-          type="application/ld+json"
-          // Built from our own data, never user input.
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(entry) }}
-        />
-      ))}
-    </>
-  )
+    upsertCanonical(url)
+
+    const parsedAlternates = JSON.parse(serializedAlternates) as {
+      locale: string
+      path: string
+    }[]
+    replaceAll('link[rel="alternate"][hreflang]', () =>
+      parsedAlternates.flatMap((alt, index) => {
+        const link = document.createElement("link")
+        link.setAttribute("rel", "alternate")
+        link.setAttribute("hreflang", alt.locale)
+        link.setAttribute("href", absoluteUrl(alt.path))
+        link.setAttribute(OWNED, "")
+        if (index > 0) return [link]
+        // The first locale doubles as the x-default target.
+        const fallback = document.createElement("link")
+        fallback.setAttribute("rel", "alternate")
+        fallback.setAttribute("hreflang", "x-default")
+        fallback.setAttribute("href", absoluteUrl(alt.path))
+        fallback.setAttribute(OWNED, "")
+        return [link, fallback]
+      })
+    )
+
+    const parsedStructured = JSON.parse(serializedStructured) as unknown[]
+    replaceAll(`script[type="application/ld+json"][${OWNED}]`, () =>
+      parsedStructured.map((entry) => {
+        const script = document.createElement("script")
+        script.type = "application/ld+json"
+        script.setAttribute(OWNED, "")
+        script.textContent = JSON.stringify(entry)
+        return script
+      })
+    )
+  }, [
+    resolvedTitle,
+    description,
+    url,
+    imageUrl,
+    type,
+    noindex,
+    publishedAt,
+    modifiedAt,
+    serializedAlternates,
+    serializedStructured,
+    i18n.language,
+  ])
+
+  return null
 }
 
 /**
  * Applies the `handle.seo` of every matched route, deepest last so a page can
- * override its layout. Rendered once per layout — pages only need <Seo> when
- * their metadata depends on state rather than loader data.
+ * override its layout. Rendered once per layout.
  */
 export function RouteSeo() {
   const matches = useMatches()

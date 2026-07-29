@@ -18,7 +18,9 @@ import { existsSync } from "node:fs"
 import puppeteer from "puppeteer-core"
 
 const DIST = "dist"
-const PORT = Number(process.env.PRERENDER_PORT ?? 4180)
+// Defaults to Vite's preview port because that origin is already in the
+// backend's CORS allowlist — route loaders must reach the API while rendering.
+const PORT = Number(process.env.PRERENDER_PORT ?? 4173)
 const CHROME =
   process.env.CHROME_PATH ??
   [
