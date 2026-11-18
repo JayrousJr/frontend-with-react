@@ -38,11 +38,8 @@ export function LoginForm({
 
   async function onSubmit(values: LoginValues) {
     try {
-      const { accessToken, refreshToken } = await login(
-        values.email,
-        values.password
-      )
-      await authLogin(accessToken, refreshToken)
+      const { accessToken } = await login(values.email, values.password)
+      await authLogin(accessToken)
       navigate(ROUTES.DASHBOARD, { replace: true })
     } catch (err) {
       setRootError(form.setError, err, t("general_error"))
