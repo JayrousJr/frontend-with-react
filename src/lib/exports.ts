@@ -1,6 +1,5 @@
 import type { NavItemType } from "@/components/ui/navigation-menu"
 import {
-  AudioLinesIcon,
   BookOpen,
   Computer,
   FileText,
@@ -22,7 +21,6 @@ import {
   Settings2Icon,
   ShieldCheck,
   TableProperties,
-  TerminalIcon,
   TerminalSquareIcon,
   Twitter,
   Video,
@@ -159,7 +157,7 @@ export const footerDetails = {
         },
         {
           name: "GitHub Repository",
-          url: "#",
+          url: "https://github.com/JayrousJr/frontend-with-react",
         },
       ],
     },
@@ -182,7 +180,7 @@ export const footerDetails = {
     {
       name: "github",
       active: true,
-      url: "#",
+      url: "https://github.com/JayrousJr/frontend-with-react",
       icon: Github,
       color: "text-primary",
     },
@@ -196,7 +194,7 @@ export const footerDetails = {
     {
       name: "linkedin",
       active: true,
-      url: "#",
+      url: "https://www.linkedin.com/in/joshua-jayrousjr",
       icon: Linkedin,
       color: "text-primary",
     },
@@ -208,19 +206,9 @@ export const footerDetails = {
 // App sidebar
 export const teams = [
   {
-    name: "Acme Inc",
+    name: "Legolas",
     logo: GalleryVerticalEndIcon,
     plan: "Enterprise",
-  },
-  {
-    name: "Acme Corp.",
-    logo: AudioLinesIcon,
-    plan: "Startup",
-  },
-  {
-    name: "Evil Corp.",
-    logo: TerminalIcon,
-    plan: "Free",
   },
 ]
 
@@ -306,6 +294,26 @@ export const navMain: NavMainItem[] = [
         title: () => t("dashboards.navMain.newsletter.visitors"),
         url: ROUTES.VISITORS,
         requiredPermissions: [PERMISSIONS.ANALYTICS.READ],
+      },
+    ],
+  },
+  {
+    id: "content",
+    title: () => t("dashboards.navMain.content.title"),
+    url: "#",
+    icon: ScrollText,
+    items: [
+      {
+        id: "content-posts",
+        title: () => t("dashboards.navMain.content.posts"),
+        url: ROUTES.POSTS,
+        requiredPermissions: [PERMISSIONS.CONTENT.READ],
+      },
+      {
+        id: "content-redirects",
+        title: () => t("dashboards.navMain.content.redirects"),
+        url: ROUTES.REDIRECTS,
+        requiredPermissions: [PERMISSIONS.SEO.MANAGE],
       },
     ],
   },

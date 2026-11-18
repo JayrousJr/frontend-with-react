@@ -17,29 +17,25 @@ const OauthCallback = () => {
   const { t } = useTranslation()
 
   // Read the fragment once, synchronously, before anything can re-render.
-  const [tokens] = useState(() => {
-    const params = new URLSearchParams(window.location.hash.slice(1))
-    return {
-      accessToken: params.get("accessToken"),
-      refreshToken: params.get("refreshToken"),
-    }
-  })
-  const [failed, setFailed] = useState(
-    !tokens.accessToken || !tokens.refreshToken
+  // Only the access token rides in the fragment — the refresh token arrived
+  // as an HttpOnly cookie set by the backend during the redirect.
+  const [accessToken] = useState(() =>
+    new URLSearchParams(window.location.hash.slice(1)).get("accessToken")
   )
+  const [failed, setFailed] = useState(!accessToken)
   const handled = useRef(false)
 
   useEffect(() => {
     // Scrub the tokens out of the address bar and browser history.
     window.history.replaceState(null, "", window.location.pathname)
 
-    if (handled.current || !tokens.accessToken || !tokens.refreshToken) return
+    if (handled.current || !accessToken) return
     handled.current = true
 
-    login(tokens.accessToken, tokens.refreshToken)
+    login(accessToken)
       .then(() => navigate(ROUTES.DASHBOARD, { replace: true }))
       .catch(() => setFailed(true))
-  }, [login, navigate, tokens])
+  }, [login, navigate, accessToken])
 
   if (failed) {
     return (

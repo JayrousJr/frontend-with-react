@@ -362,3 +362,78 @@ query GetMyNotifications($pagination: PaginationInput, $filter: NotificationFilt
     unreadCount
   }
 }`
+
+//  Content (SEO / blog)
+
+const POST_FIELDS = `
+  uniqueId
+  slug
+  title
+  excerpt
+  bodyHtml
+  status
+  locale
+  translationKey
+  publishedAt
+  metaTitle
+  metaDescription
+  canonicalUrl
+  noIndex
+  coverImage
+  createdAt
+  updatedAt
+`
+
+export const GET_PUBLISHED_POSTS = `
+query GetPublishedPosts($locale: String, $pagination: PaginationInput) {
+  getPublishedPosts(locale: $locale, pagination: $pagination) {
+    data { ${POST_FIELDS} }
+    total
+    page
+    limit
+    totalPages
+    hasNextPage
+    hasPrevPage
+  }
+}`
+
+export const GET_POST_BY_SLUG = `
+query GetPostBySlug($slug: String!, $locale: String) {
+  getPostBySlug(slug: $slug, locale: $locale) { ${POST_FIELDS} }
+}`
+
+export const GET_POSTS = `
+query GetPosts($filter: PostFilterInput, $pagination: PaginationInput) {
+  getPosts(filter: $filter, pagination: $pagination) {
+    data { ${POST_FIELDS} }
+    total
+    page
+    limit
+    totalPages
+    hasNextPage
+    hasPrevPage
+  }
+}`
+
+export const GET_POST = `
+query GetPost($uniqueId: String!) {
+  getPost(uniqueId: $uniqueId) { ${POST_FIELDS} }
+}`
+
+export const RESOLVE_REDIRECT = `
+query ResolveRedirect($path: String!) {
+  resolveRedirect(path: $path) { toPath statusCode }
+}`
+
+export const GET_REDIRECTS = `
+query GetRedirects($pagination: PaginationInput) {
+  getRedirects(pagination: $pagination) {
+    data { uniqueId fromPath toPath statusCode hitCount createdAt }
+    total
+    page
+    limit
+    totalPages
+    hasNextPage
+    hasPrevPage
+  }
+}`

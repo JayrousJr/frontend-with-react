@@ -42,9 +42,9 @@ export async function fetchMe(): Promise<User> {
 }
 
 // REST auth endpoints (public, no JWT required)
+/** The refresh token is not in the body — it arrives as an HttpOnly cookie. */
 type LoginResponse = {
   accessToken: string
-  refreshToken: string
 }
 
 export async function login(

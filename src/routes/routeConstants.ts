@@ -8,6 +8,8 @@ export const ROUTES = {
 
   // Dashboards
   HOME: "/",
+  BLOG: "/blog",
+  BLOG_POST: "/blog/:slug",
   DASHBOARD: "/dashboard",
   USERS: "/users",
   USER_DETAILS: "/users/:uniqueId",
@@ -16,6 +18,10 @@ export const ROUTES = {
   CAMPAIGN_DETAILS: "/campaigns/:uniqueId",
   SUBSCRIBERS: "/subscribers",
   VISITORS: "/visitors",
+  POSTS: "/content",
+  POST_NEW: "/content/new",
+  POST_EDIT: "/content/:uniqueId",
+  REDIRECTS: "/seo/redirects",
   REPORTS: "/reports",
   SETTINGS: "/settings",
 

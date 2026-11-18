@@ -13,6 +13,24 @@ A React 19 + Vite + TypeScript frontend template built for **security, RBAC, and
 ## Getting started
 
 ```bash
+git clone <repo-url> my-app
+cd my-app
+
+# Run the setup script — it will:
+#   - Remove template .git history and init a fresh repo
+#   - Rename the project in package.json and index.html
+#   - Create .env pointing at your backend URL
+#   - Install dependencies, create an initial commit, and remove itself
+bash setup.sh
+
+pnpm dev
+```
+
+### Manual setup (if you prefer)
+
+```bash
+rm -rf .git && git init
+# Rename "frontend-react-template" in package.json and titles in index.html
 pnpm install
 cp .env.example .env
 pnpm dev
@@ -74,7 +92,9 @@ The **admin role bypasses every permission check**, mirroring the backend's `Per
 `AuthProvider` validates the session once on mount, branching on `VITE_AUTH_STRATEGY`:
 
 - `"session"` — `GET /auth/me` with cookies
-- `"jwt"` — `POST /auth/refresh` with the stored refresh token, then persists both tokens to localStorage (a deliberate tradeoff so sessions survive reloads)
+- `"jwt"` — `POST /auth/refresh`, which the browser authenticates with an **HttpOnly refresh-token cookie** the backend set at login
+
+**Token storage:** the access token is held **in memory only** (`src/services/api.ts`) and the refresh token is an `HttpOnly; SameSite=Strict` cookie, so neither is reachable from JavaScript — an XSS cannot exfiltrate a long-lived credential. A page reload has no token in memory, so `AuthProvider` trades the cookie for a fresh access token on mount. Anything rendering user-authored HTML must still be sanitized (see `campaign-details.tsx`, which runs `DOMPurify.sanitize`).
 
 `useAuth()` exposes `{ isLoading, isAuthenticated, user, login, logout, refreshUser }`. `AuthProvider` is also the single owner of locale sync — it applies `user.preferredLocale` to i18next and persists it, so a user's language preference follows them across devices once they're logged in.
 
@@ -95,6 +115,62 @@ Forms use **react-hook-form + zod**, wired to the shadcn `Field` primitives — 
 3. **Backend errors** go to the form's root error via `setRootError(form.setError, err, fallback)` (`src/lib/form.ts`), rendered with `<FieldError errors={[form.formState.errors.root]} />` — backend messages arrive already localized via the `x-lang` header, so they're shown verbatim.
 4. `form.formState.isSubmitting` drives the submit button's disabled/loading state — no manual `useState` bookkeeping.
 
+## File uploads
+
+`FileUpload` (`src/components/file-upload.tsx`) is the standard uploader, built on the `Attachment` primitives (`components/ui/attachment.tsx`): a dashed drop zone plus one attachment card per file. `settings/profile-tab.tsx` is the reference usage.
+
+```tsx
+<FileUpload
+  accept="image/*"
+  maxSize={MAX_UPLOAD_SIZE}
+  onUpload={async (file, { onProgress, signal }) => {
+    await uploadAvatar(file, { onProgress, signal })
+  }}
+/>
+```
+
+What it handles for you:
+
+- **Real progress** — the `onProgress` callback is wired to axios `onUploadProgress`, so the card shows actual percentages, not a fake bar.
+- **Cancellation** — the `signal` is an `AbortSignal`; forward it to axios and the ✕ on an in-flight upload genuinely aborts the request.
+- **Inline errors with retry** — throw from `onUpload` and the card flips to the error state showing the thrown message (backend messages are already localized via `x-lang`), with a retry action. Size and type violations fail locally without spending a request.
+- **Image previews** — image files render a thumbnail that dims while uploading and brightens when done.
+
+Keep `maxSize` aligned with the backend's `MAX_FILE_SIZE` (`storage.constants.ts`) — `MAX_UPLOAD_SIZE` in `src/services/account.ts` mirrors it.
+
+## SEO
+
+The public surface is search-optimized; everything behind auth is explicitly excluded.
+
+**Per-route metadata.** SEO lives in the route config, next to loaders and guards:
+
+```tsx
+{
+  path: ROUTES.BLOG,
+  loader: async () => ({ posts: await fetchPublishedPosts() }),
+  handle: { seo: { title: "Blog", description: "Latest articles." } },
+}
+```
+
+`handle.seo` is either a static object or a function of the route's loader data (see the `/blog/:slug` route, which derives title, canonical, OG image and Article JSON-LD from the post). `RouteSeo`, rendered once per layout, merges the handles of all matched routes — deepest wins — so a page overrides its layout. The `/auth/*` and `ProtectedRoute` groups set `noindex` at the group level, so no dashboard page can leak into search results.
+
+`Seo` writes tags imperatively rather than as JSX. React 19 hoists `<title>`/`<meta>` on its own, but lazy routes suspend and remount, which left orphaned tags behind — a production build accumulated four `<title>` elements. Upserting by selector guarantees exactly one of each.
+
+**What it emits:** title, description, canonical, robots, full Open Graph + Twitter card, `hreflang` alternates with `x-default`, and JSON-LD (`organizationJsonLd`, `websiteJsonLd`, `articleJsonLd`, `breadcrumbJsonLd` in `src/lib/seo.ts`).
+
+**Prerendering.** This is a client-rendered SPA: every route ships the same empty `index.html`. Googlebot executes JS, but social crawlers (Facebook, X, LinkedIn, WhatsApp, Slack) never do — without prerendering, every share preview falls back to generic site-wide tags. `pnpm prerender` (after `pnpm build`) renders the public routes with headless Chrome and writes real HTML into `dist/`:
+
+```bash
+pnpm build
+PRERENDER_ROUTES=/,/blog,/blog/my-post pnpm prerender
+```
+
+The prerender server runs on port 4173 because route loaders call the API while rendering, and that origin is already in the backend's `CORS_ORIGINS`. Only public routes need it — authenticated pages are noindex.
+
+**robots.txt / sitemap.xml** are generated by the backend from live content (see its README). `public/robots.txt` is a static fallback, and `nginx.conf` has an optional block to proxy both from the site's own origin.
+
+`VITE_SITE_URL` must be set in production — canonical and OG URLs are absolute, and the runtime-origin fallback produces wrong values during prerendering.
+
 ## Real-time notifications
 
 `NotificationBell` (in the dashboard header) shows a badge with the unread count and a popover list. It connects to the backend's Socket.io gateway (`src/lib/socket.ts` — singleton, JWT handshake) and prepends + toasts incoming `notification` events live. Notification content arrives as i18n keys plus JSON-encoded params (`titleKey` / `messageKey` / `params`), rendered with the user's current locale — new notification kinds only need translation entries under `notifications.*` in each locale file. The socket requires a JWT access token, so under the `"session"` auth strategy the bell degrades gracefully to fetch-on-load without live pushes.
@@ -114,8 +190,18 @@ Vitest runs two kinds of tests:
 
 `pnpm build` outputs a static SPA to `dist/`. Because routing uses `createBrowserRouter`, the server **must rewrite unknown paths to `index.html`** or every deep link and page refresh 404s:
 
+- **Docker (included)** — the `Dockerfile` builds the app and serves it with nginx (`nginx.conf` has the SPA fallback, gzip, and immutable caching for hashed assets). Vite env vars are baked in at **build time**, so pass them as build args:
+
+  ```bash
+  docker build \
+    --build-arg VITE_API_URL=https://api.example.com/api \
+    --build-arg VITE_GRAPHQL_URL=https://api.example.com/api/graphql \
+    -t my-frontend .
+  docker run -p 8080:80 my-frontend
+  ```
+
 - **Netlify / Vercel / Cloudflare Pages** — handled by their SPA preset (or a one-line `_redirects` / `vercel.json` rewrite).
-- **nginx**:
+- **nginx (bare)** — see `nginx.conf` in the repo root for the full config; the essential line:
 
   ```nginx
   location / {
@@ -124,6 +210,27 @@ Vitest runs two kinds of tests:
   ```
 
 The chunk-splitting config in `vite.config.ts` separates the heaviest stable vendors (react, motion, i18n, charts) so app-code changes don't invalidate the whole vendor download. `RouterErrorBoundary` already handles the stale-chunk-after-redeploy case with a reload prompt.
+
+## Keeping your project up to date
+
+Projects created from this template have **no automatic link back to it** — you own a divergent copy. Three ways to pull in template improvements, from manual to automated:
+
+1. **Follow the releases.** Each [release](https://github.com/JayrousJr/frontend-with-react/releases) describes what changed and how to apply it to an existing project. Commits are small and conventional, so individual changes are easy to cherry-pick by hand.
+
+2. **Template remote** (best adopted right after scaffolding, degrades as you diverge):
+
+   ```bash
+   git remote add template git@github.com:JayrousJr/frontend-with-react.git
+   # when the template releases updates:
+   git fetch template
+   git merge template/main --allow-unrelated-histories
+   ```
+
+   Files you never touched merge cleanly; files you customized raise conflicts to resolve deliberately.
+
+3. **Automated sync PRs** — install [`actions-template-sync`](https://github.com/AndreasAugustin/actions-template-sync) in your project and template changes arrive as reviewable pull requests on a schedule.
+
+After significant divergence, most projects stop syncing wholesale and instead read the template's release diffs for ideas — that's expected and fine.
 
 ## Before you ship this
 
