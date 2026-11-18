@@ -1,3 +1,4 @@
+import { RouteSeo } from "@/components/seo"
 import { AppSidebar } from "@/components/app-sidebar"
 import LanguageSwitcher from "@/components/languageSwitcher"
 import NotificationBell from "@/components/notification-bell"
@@ -92,6 +93,7 @@ const DashboardLayout = () => {
             </div>
           </header>
           <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+            <RouteSeo />
             <Outlet />
           </div>
         </SidebarInset>

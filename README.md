@@ -92,7 +92,9 @@ The **admin role bypasses every permission check**, mirroring the backend's `Per
 `AuthProvider` validates the session once on mount, branching on `VITE_AUTH_STRATEGY`:
 
 - `"session"` — `GET /auth/me` with cookies
-- `"jwt"` — `POST /auth/refresh` with the stored refresh token, then persists both tokens to localStorage (a deliberate tradeoff so sessions survive reloads)
+- `"jwt"` — `POST /auth/refresh`, which the browser authenticates with an **HttpOnly refresh-token cookie** the backend set at login
+
+**Token storage:** the access token is held **in memory only** (`src/services/api.ts`) and the refresh token is an `HttpOnly; SameSite=Strict` cookie, so neither is reachable from JavaScript — an XSS cannot exfiltrate a long-lived credential. A page reload has no token in memory, so `AuthProvider` trades the cookie for a fresh access token on mount. Anything rendering user-authored HTML must still be sanitized (see `campaign-details.tsx`, which runs `DOMPurify.sanitize`).
 
 `useAuth()` exposes `{ isLoading, isAuthenticated, user, login, logout, refreshUser }`. `AuthProvider` is also the single owner of locale sync — it applies `user.preferredLocale` to i18next and persists it, so a user's language preference follows them across devices once they're logged in.
 
@@ -112,6 +114,62 @@ Forms use **react-hook-form + zod**, wired to the shadcn `Field` primitives — 
 2. **`TextField`** (`src/components/form/text-field.tsx`) — a typed `Controller` wrapper rendering label, input, and inline `FieldError` in one tag. Extend the same shape for selects, checkboxes, etc.
 3. **Backend errors** go to the form's root error via `setRootError(form.setError, err, fallback)` (`src/lib/form.ts`), rendered with `<FieldError errors={[form.formState.errors.root]} />` — backend messages arrive already localized via the `x-lang` header, so they're shown verbatim.
 4. `form.formState.isSubmitting` drives the submit button's disabled/loading state — no manual `useState` bookkeeping.
+
+## File uploads
+
+`FileUpload` (`src/components/file-upload.tsx`) is the standard uploader, built on the `Attachment` primitives (`components/ui/attachment.tsx`): a dashed drop zone plus one attachment card per file. `settings/profile-tab.tsx` is the reference usage.
+
+```tsx
+<FileUpload
+  accept="image/*"
+  maxSize={MAX_UPLOAD_SIZE}
+  onUpload={async (file, { onProgress, signal }) => {
+    await uploadAvatar(file, { onProgress, signal })
+  }}
+/>
+```
+
+What it handles for you:
+
+- **Real progress** — the `onProgress` callback is wired to axios `onUploadProgress`, so the card shows actual percentages, not a fake bar.
+- **Cancellation** — the `signal` is an `AbortSignal`; forward it to axios and the ✕ on an in-flight upload genuinely aborts the request.
+- **Inline errors with retry** — throw from `onUpload` and the card flips to the error state showing the thrown message (backend messages are already localized via `x-lang`), with a retry action. Size and type violations fail locally without spending a request.
+- **Image previews** — image files render a thumbnail that dims while uploading and brightens when done.
+
+Keep `maxSize` aligned with the backend's `MAX_FILE_SIZE` (`storage.constants.ts`) — `MAX_UPLOAD_SIZE` in `src/services/account.ts` mirrors it.
+
+## SEO
+
+The public surface is search-optimized; everything behind auth is explicitly excluded.
+
+**Per-route metadata.** SEO lives in the route config, next to loaders and guards:
+
+```tsx
+{
+  path: ROUTES.BLOG,
+  loader: async () => ({ posts: await fetchPublishedPosts() }),
+  handle: { seo: { title: "Blog", description: "Latest articles." } },
+}
+```
+
+`handle.seo` is either a static object or a function of the route's loader data (see the `/blog/:slug` route, which derives title, canonical, OG image and Article JSON-LD from the post). `RouteSeo`, rendered once per layout, merges the handles of all matched routes — deepest wins — so a page overrides its layout. The `/auth/*` and `ProtectedRoute` groups set `noindex` at the group level, so no dashboard page can leak into search results.
+
+`Seo` writes tags imperatively rather than as JSX. React 19 hoists `<title>`/`<meta>` on its own, but lazy routes suspend and remount, which left orphaned tags behind — a production build accumulated four `<title>` elements. Upserting by selector guarantees exactly one of each.
+
+**What it emits:** title, description, canonical, robots, full Open Graph + Twitter card, `hreflang` alternates with `x-default`, and JSON-LD (`organizationJsonLd`, `websiteJsonLd`, `articleJsonLd`, `breadcrumbJsonLd` in `src/lib/seo.ts`).
+
+**Prerendering.** This is a client-rendered SPA: every route ships the same empty `index.html`. Googlebot executes JS, but social crawlers (Facebook, X, LinkedIn, WhatsApp, Slack) never do — without prerendering, every share preview falls back to generic site-wide tags. `pnpm prerender` (after `pnpm build`) renders the public routes with headless Chrome and writes real HTML into `dist/`:
+
+```bash
+pnpm build
+PRERENDER_ROUTES=/,/blog,/blog/my-post pnpm prerender
+```
+
+The prerender server runs on port 4173 because route loaders call the API while rendering, and that origin is already in the backend's `CORS_ORIGINS`. Only public routes need it — authenticated pages are noindex.
+
+**robots.txt / sitemap.xml** are generated by the backend from live content (see its README). `public/robots.txt` is a static fallback, and `nginx.conf` has an optional block to proxy both from the site's own origin.
+
+`VITE_SITE_URL` must be set in production — canonical and OG URLs are absolute, and the runtime-origin fallback produces wrong values during prerendering.
 
 ## Real-time notifications
 
