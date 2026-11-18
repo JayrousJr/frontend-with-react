@@ -33,7 +33,6 @@ export function NavUser() {
   const navigate = useNavigate()
   const avatarSrc = useAuthenticatedImage(user?.avatar)
   const { t } = useTranslation()
-  console.log(avatarSrc)
 
   if (!user) return null
 

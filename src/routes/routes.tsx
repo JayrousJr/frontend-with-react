@@ -19,6 +19,15 @@ import {
 } from "@/services/campaigns"
 import { fetchPageViews, fetchVisitorStats } from "@/services/analytics"
 import { fetchNewsletterSubscribers } from "@/services/newsletter"
+import {
+  fetchPost,
+  fetchPostBySlug,
+  fetchPosts,
+  fetchPublishedPosts,
+  fetchRedirects,
+} from "@/services/content"
+import { articleJsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/seo"
+import type { Post } from "@/services/content"
 import { PERMISSIONS } from "@/lib/permissions"
 
 async function lazyPage(importFn: () => Promise<{ default: ComponentType }>) {
@@ -39,7 +48,60 @@ export const routes = createBrowserRouter([
   {
     Component: LandingLayout,
     errorElement: <RouterErrorBoundary />,
-    children: [{ index: true, Component: RootIndex }],
+    children: [
+      {
+        index: true,
+        Component: RootIndex,
+        handle: {
+          seo: {
+            title: undefined,
+            description:
+              "A production-ready React, Vite and TypeScript template with authentication, RBAC, dashboards and internationalization built in.",
+            jsonLd: [organizationJsonLd(), websiteJsonLd()],
+          },
+        },
+      },
+      {
+        path: ROUTES.BLOG,
+        loader: async () => ({ posts: await fetchPublishedPosts() }),
+        lazy: () => lazyPage(() => import("@/pages/guests/blog/blog-list")),
+        handle: {
+          seo: { title: "Blog", description: "Latest articles and updates." },
+        },
+      },
+      {
+        path: ROUTES.BLOG_POST,
+        loader: async ({ params }) => ({
+          post: await fetchPostBySlug(params.slug!),
+        }),
+        lazy: () => lazyPage(() => import("@/pages/guests/blog/blog-post")),
+        // Metadata comes from the post itself, so it is derived from loader data.
+        handle: {
+          seo: (data: unknown) => {
+            const post = (data as { post: Post } | undefined)?.post
+            if (!post) return {}
+            return {
+              title: post.metaTitle ?? post.title,
+              description: post.metaDescription ?? post.excerpt ?? undefined,
+              canonical: post.canonicalUrl ?? `/blog/${post.slug}`,
+              image: post.coverImage ?? undefined,
+              type: "article" as const,
+              noindex: post.noIndex,
+              publishedAt: post.publishedAt ?? undefined,
+              modifiedAt: post.updatedAt,
+              jsonLd: articleJsonLd({
+                title: post.title,
+                description: post.metaDescription ?? post.excerpt,
+                path: `/blog/${post.slug}`,
+                image: post.coverImage,
+                publishedAt: post.publishedAt,
+                modifiedAt: post.updatedAt,
+              }),
+            }
+          },
+        },
+      },
+    ],
   },
 
   /** OAuth landing — outside PublicOnlyRoute: it starts unauthenticated and
@@ -55,6 +117,8 @@ export const routes = createBrowserRouter([
     path: "auth",
     Component: PublicOnlyRoute,
     errorElement: <RouterErrorBoundary />,
+    // Sign-in flows must never appear in search results.
+    handle: { seo: { noindex: true } },
     children: [
       {
         Component: AuthLayout,
@@ -92,6 +156,8 @@ export const routes = createBrowserRouter([
   {
     Component: ProtectedRoute,
     errorElement: <RouterErrorBoundary />,
+    // Everything behind auth is noindex by default.
+    handle: { seo: { noindex: true } },
     children: [
       {
         Component: DashboardLayout,
@@ -232,6 +298,57 @@ export const routes = createBrowserRouter([
                   lazyPage(
                     () => import("@/pages/dashboard/subscribers/subscribers")
                   ),
+              },
+            ],
+          },
+
+          /** Permission-gated: SEO content (backend requires content.read) */
+          {
+            element: (
+              <PermissionRoute
+                requiredPermissions={[PERMISSIONS.CONTENT.READ]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.POSTS,
+                loader: async ({ request }) => {
+                  const params = new URL(request.url).searchParams
+                  return {
+                    posts: await fetchPosts(
+                      {
+                        page: Number(params.get("page") ?? "1"),
+                        limit: Number(params.get("limit") ?? "10"),
+                      },
+                      { search: params.get("q") || undefined }
+                    ),
+                  }
+                },
+                lazy: () =>
+                  lazyPage(() => import("@/pages/dashboard/content/posts")),
+              },
+              {
+                path: ROUTES.POST_NEW,
+                lazy: () =>
+                  lazyPage(
+                    () => import("@/pages/dashboard/content/post-editor")
+                  ),
+              },
+              {
+                path: ROUTES.POST_EDIT,
+                loader: async ({ params }) => ({
+                  post: await fetchPost(params.uniqueId!),
+                }),
+                lazy: () =>
+                  lazyPage(
+                    () => import("@/pages/dashboard/content/post-editor")
+                  ),
+              },
+              {
+                path: ROUTES.REDIRECTS,
+                loader: async () => ({ redirects: await fetchRedirects() }),
+                lazy: () =>
+                  lazyPage(() => import("@/pages/dashboard/content/redirects")),
               },
             ],
           },
