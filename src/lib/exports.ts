@@ -1,6 +1,8 @@
 import type { LucideIcon } from "lucide-react"
 import {
   Building2Icon,
+  PackageSearchIcon,
+  WarehouseIcon,
   LayoutDashboardIcon,
   ShieldCheckIcon,
   UsersIcon,
@@ -58,6 +60,27 @@ export const navMain: NavMainItem[] = [
         url: ROUTES.SETTINGS,
       },
       {
+        id: "approvals",
+        title: () => t("nav.approvals", "My approvals"),
+        url: ROUTES.APPROVALS,
+      },
+      {
+        id: "reports",
+        title: () => t("nav.reports", "Reports"),
+        url: ROUTES.REPORTS,
+        anyPermissions: [
+          P.EMPLOYEE_VIEW,
+          P.USER_VIEW,
+          P.ROLE_VIEW,
+          P.SECURITY_VIEW_LOGINS,
+          P.DELEGATION_APPROVE,
+          P.EMPLOYEE_EXIT,
+          P.EMPLOYEE_IMPORT,
+          P.ASSET_VIEW,
+          P.STOCK_VIEW,
+        ],
+      },
+      {
         id: "delegations",
         title: () => t("nav.delegations", "Delegations"),
         url: ROUTES.DELEGATIONS,
@@ -99,6 +122,72 @@ export const navMain: NavMainItem[] = [
         url: ROUTES.EMPLOYEES,
         requiredPermissions: [P.EMPLOYEE_VIEW],
       },
+      {
+        id: "exit-clearances",
+        title: () => t("nav.exit_clearances", "Exit clearances"),
+        url: ROUTES.EXIT_CLEARANCES,
+        anyPermissions: [P.EMPLOYEE_EXIT, P.EXIT_CLEARANCE_APPROVE],
+      },
+    ],
+  },
+  {
+    id: "products",
+    title: () => t("nav.products_section", "Products"),
+    url: "#",
+    icon: PackageSearchIcon,
+    isActive: true,
+    items: [
+      {
+        id: "product-repository",
+        title: () => t("nav.products", "Product Repository"),
+        url: ROUTES.PRODUCTS,
+        anyPermissions: [P.ITEM_VIEW, P.ITEM_CREATE, P.ITEM_MANAGE],
+      },
+      {
+        id: "product-categories",
+        title: () => t("nav.categories", "Categories"),
+        url: ROUTES.PRODUCT_CATEGORIES,
+        requiredPermissions: [P.ITEM_CATEGORY_MANAGE],
+      },
+    ],
+  },
+  {
+    id: "store",
+    title: () => t("nav.store", "Store"),
+    url: "#",
+    icon: WarehouseIcon,
+    isActive: true,
+    items: [
+      {
+        id: "stock",
+        title: () => t("nav.stock", "Stock"),
+        url: ROUTES.STOCK,
+        requiredPermissions: [P.STOCK_VIEW],
+      },
+      {
+        id: "assets",
+        title: () => t("nav.assets", "Assets"),
+        url: ROUTES.ASSETS,
+        anyPermissions: [P.ASSET_VIEW, P.STOCK_VIEW],
+      },
+      {
+        id: "adjustments",
+        title: () => t("nav.adjustments", "Adjustments"),
+        url: ROUTES.ADJUSTMENTS,
+        anyPermissions: [P.STOCK_ADJUST, P.STOCK_VIEW, P.STORE_MANAGE],
+      },
+      {
+        id: "tags",
+        title: () => t("nav.tags", "Asset tags"),
+        url: ROUTES.ASSET_TAGS,
+        requiredPermissions: [P.ASSET_TAG_PRINT],
+      },
+      {
+        id: "stores",
+        title: () => t("nav.stores", "Stores & locations"),
+        url: ROUTES.STORES,
+        anyPermissions: [P.STORE_MANAGE, P.STOCK_VIEW, P.ASSET_VIEW],
+      },
     ],
   },
   {
@@ -125,6 +214,12 @@ export const navMain: NavMainItem[] = [
         title: () => t("nav.groups", "Groups"),
         url: ROUTES.GROUPS,
         requiredPermissions: [P.GROUP_MANAGE],
+      },
+      {
+        id: "workflows",
+        title: () => t("nav.workflows", "Approval chains"),
+        url: ROUTES.WORKFLOWS,
+        requiredPermissions: [P.WORKFLOW_VIEW],
       },
       {
         id: "policies",

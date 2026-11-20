@@ -49,6 +49,7 @@ import {
   type EmployeeStatus,
 } from "@/services/employees"
 import { createUsersFromEmployees } from "@/services/users"
+import { ExitClearanceCard } from "./exit-clearance-card"
 import { EmployeeFormSheet } from "./employee-form"
 
 type Dialogs = "edit" | "status" | "driver" | "user" | null
@@ -253,6 +254,9 @@ const EmployeeDetailsPage = () => {
               )}
             </CardContent>
           </Card>
+          {employee.status === "EXITED" && (
+            <ExitClearanceCard employeeUniqueId={employee.uniqueId} />
+          )}
           {employee.driverProfile && (
             <Card>
               <CardHeader>

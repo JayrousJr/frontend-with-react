@@ -28,7 +28,30 @@ export const P = {
   AUDIT_VIEW: "audit.view",
   DELEGATION_CREATE: "delegation.create",
   DELEGATION_APPROVE: "delegation.approve",
+  WORKFLOW_VIEW: "workflow.view",
+  WORKFLOW_MANAGE: "workflow.manage",
+  WORKFLOW_ACTIVATE: "workflow.activate",
+  EXIT_CLEARANCE_APPROVE: "employee.exit_clearance.approve",
   SECURITY_VIEW_LOGINS: "security.view_logins",
+  // B1 — Product Repository
+  ITEM_VIEW: "item.view",
+  ITEM_CREATE: "item.create",
+  ITEM_EDIT_DRAFT: "item.edit_draft",
+  ITEM_SUBMIT: "item.submit",
+  ITEM_IMPORT: "item.import",
+  ITEM_APPROVE: "item.approve",
+  ITEM_MANAGE: "item.manage",
+  ITEM_MERGE: "item.merge",
+  ITEM_CATEGORY_MANAGE: "item_category.manage",
+  // B2 — Store & Inventory
+  STORE_MANAGE: "store.manage",
+  STOCK_VIEW: "stock.view",
+  STOCK_ISSUE: "stock.issue",
+  STOCK_ADJUST: "stock.adjust",
+  STOCK_ADJUSTMENT_APPROVE: "stock_adjustment.approve",
+  ASSET_VIEW: "asset.view",
+  ASSET_EDIT: "asset.edit",
+  ASSET_TAG_PRINT: "asset.tag_print",
 } as const
 
 /**

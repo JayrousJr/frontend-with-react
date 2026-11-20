@@ -363,7 +363,18 @@
     "campaign_sent_title": "Kampeni imetumwa",
     "campaign_sent_message": "\"{{subject}}\" imewasilishwa kwa wanachama wako.",
     "campaign_failed_title": "Kampeni imeshindikana",
-    "campaign_failed_message": "\"{{subject}}\" haikuweza kutumwa. Kagua kampeni na ujaribu tena."
+    "campaign_failed_message": "\"{{subject}}\" haikuweza kutumwa. Kagua kampeni na ujaribu tena.",
+    "approval_task_title": "Idhini inahitajika",
+    "approval_task_message": "{{title}} inakusubiri ({{step}}).",
+    "approval_approved_title": "Ombi limeidhinishwa",
+    "approval_rejected_title": "Ombi limekataliwa",
+    "approval_returned_title": "Ombi limerudishwa",
+    "approval_finished_message": "{{title}}",
+    "delegation_pending_title": "Ukaimishaji wa kuidhinisha",
+    "delegation_pending_message": "Ukaimishaji unasubiri idhini yako.",
+    "delegation_approved_title": "Ukaimishaji umeidhinishwa",
+    "delegation_rejected_title": "Ukaimishaji umekataliwa",
+    "delegation_decided_message": "Fungua Ukaimishaji kuona maelezo."
   },
   "validation": {
     "required": "Sehemu hii inahitajika",

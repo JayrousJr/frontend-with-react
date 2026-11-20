@@ -37,6 +37,7 @@ import { formatStamp } from "@/lib/format"
 import { ROUTES, withId } from "@/routes/routeConstants"
 import { fetchRoles, type Role } from "@/services/access"
 import { fetchDepartments, type Department } from "@/services/org"
+import { fetchStores, type Store } from "@/services/store"
 import { resetUserTwoFactor } from "@/services/auth"
 import {
   fetchLoginEvents,
@@ -58,6 +59,7 @@ const UserDetailsPage = () => {
   const run = useRun()
   const [roles, setRoles] = useState<Role[]>([])
   const [departments, setDepartments] = useState<Department[]>([])
+  const [stores, setStores] = useState<Store[]>([])
   const [events, setEvents] = useState<LoginEvent[] | null>(null)
   const [confirm, setConfirm] = useState<"deactivate" | null>(null)
   const isSelf = me?.uniqueId === user.uniqueId
@@ -84,12 +86,16 @@ const UserDetailsPage = () => {
     if (hasPermission(me, P.DEPARTMENT_VIEW)) {
       void fetchDepartments().then(setDepartments)
     }
+    if (canAssign)
+      void fetchStores()
+        .then(setStores)
+        .catch(() => setStores([]))
     if (hasPermission(me, P.SECURITY_VIEW_LOGINS)) {
       void fetchLoginEvents(user.uniqueId, { limit: 20 }).then((p) =>
         setEvents(p.data)
       )
     }
-  }, [me, user.uniqueId])
+  }, [me, user.uniqueId, canAssign])
 
   const roleById = new Map(roles.map((r) => [r.uniqueId, r]))
   const dirty =
@@ -278,12 +284,37 @@ const UserDetailsPage = () => {
                     </NativeSelect>
                   )}
                   {role?.contextType === "STORE" && (
-                    <Badge variant="outline">
-                      {t(
-                        "users.store_context_later",
-                        "Per store — available with the Store module"
-                      )}
-                    </Badge>
+                    <NativeSelect
+                      size="sm"
+                      value={d.contextUniqueId ?? ""}
+                      disabled={!canAssign}
+                      aria-label={t("users.store_context", "For store")}
+                      onChange={(e) =>
+                        setDraft((prev) =>
+                          prev.map((x, j) =>
+                            j === i
+                              ? {
+                                  ...x,
+                                  contextUniqueId: e.target.value || undefined,
+                                  key: `${x.roleUniqueId}:${e.target.value}`,
+                                }
+                              : x
+                          )
+                        )
+                      }
+                    >
+                      <NativeSelectOption value="">
+                        {t("users.pick_store", "Choose store…")}
+                      </NativeSelectOption>
+                      {stores.map((st) => (
+                        <NativeSelectOption
+                          key={st.uniqueId}
+                          value={st.uniqueId}
+                        >
+                          {st.name}
+                        </NativeSelectOption>
+                      ))}
+                    </NativeSelect>
                   )}
                   {canAssign && (
                     <Button
@@ -367,6 +398,32 @@ const UserDetailsPage = () => {
             <CardTitle>{t("users.account", "Account")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
+            {user.creationApprovalStatus &&
+              user.creationApprovalStatus !== "APPROVED" &&
+              user.creationApprovalUniqueId && (
+                <Alert>
+                  <AlertDescription>
+                    {user.creationApprovalStatus === "PENDING"
+                      ? t(
+                          "users.awaiting_approval",
+                          "Waiting for creation approval; the activation link is sent once approved."
+                        )
+                      : t(
+                          "users.creation_not_approved",
+                          "Creation was not approved."
+                        )}{" "}
+                    <Link
+                      className="font-medium underline"
+                      to={withId(
+                        ROUTES.APPROVAL_DETAILS,
+                        user.creationApprovalUniqueId
+                      )}
+                    >
+                      {t("approvals.open", "Open approval")}
+                    </Link>
+                  </AlertDescription>
+                </Alert>
+              )}
             <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
               <dt className="text-muted-foreground">
                 {t("employees.employee", "Employee")}

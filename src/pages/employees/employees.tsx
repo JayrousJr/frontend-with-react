@@ -8,7 +8,7 @@ import {
 } from "react-router"
 import { useTranslation } from "react-i18next"
 import type { ColumnDef } from "@tanstack/react-table"
-import { PlusIcon, TruckIcon } from "lucide-react"
+import { FileSpreadsheetIcon, PlusIcon, TruckIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { DataTable } from "@/components/ui/data-table"
@@ -153,12 +153,22 @@ const EmployeesPage = () => {
           "Everyone who works for AzamTV. Users are created from these records."
         )}
         actions={
-          canManage && (
-            <Button onClick={() => setCreating(true)}>
-              <PlusIcon />
-              {t("employees.new", "New employee")}
-            </Button>
-          )
+          <>
+            {hasPermission(user, P.EMPLOYEE_IMPORT) && (
+              <Button variant="outline" asChild>
+                <Link to={ROUTES.EMPLOYEE_IMPORT}>
+                  <FileSpreadsheetIcon />
+                  {t("import.title", "Import employees")}
+                </Link>
+              </Button>
+            )}
+            {canManage && (
+              <Button onClick={() => setCreating(true)}>
+                <PlusIcon />
+                {t("employees.new", "New employee")}
+              </Button>
+            )}
+          </>
         }
       />
       <Card>

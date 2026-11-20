@@ -363,7 +363,18 @@
     "campaign_sent_title": "Campaign sent",
     "campaign_sent_message": "\"{{subject}}\" was delivered to your subscribers.",
     "campaign_failed_title": "Campaign failed",
-    "campaign_failed_message": "\"{{subject}}\" could not be sent. Check the campaign and try again."
+    "campaign_failed_message": "\"{{subject}}\" could not be sent. Check the campaign and try again.",
+    "approval_task_title": "Approval needed",
+    "approval_task_message": "{{title}} is waiting for you ({{step}}).",
+    "approval_approved_title": "Request approved",
+    "approval_rejected_title": "Request rejected",
+    "approval_returned_title": "Request returned",
+    "approval_finished_message": "{{title}}",
+    "delegation_pending_title": "Delegation to approve",
+    "delegation_pending_message": "A delegation is waiting for your approval.",
+    "delegation_approved_title": "Delegation approved",
+    "delegation_rejected_title": "Delegation rejected",
+    "delegation_decided_message": "Open Delegations to see the details."
   },
   "validation": {
     "required": "This field is required",

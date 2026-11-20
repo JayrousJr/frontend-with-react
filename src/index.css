@@ -129,3 +129,15 @@
     @apply font-sans;
   }
 }
+
+/* Printing (asset tags, notes): only the page content. */
+@media print {
+  [data-slot="sidebar"],
+  [data-slot="sidebar-gap"],
+  [data-slot="sidebar-inset"] > header {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+}

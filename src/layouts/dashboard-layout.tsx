@@ -29,7 +29,7 @@ const DashboardLayout = () => {
   const isLoading = navigation.state === "loading"
   const pathSegments = pathname.split("/").filter(Boolean)
   // Grouping segments (/admin, /organisation) are not pages of their own.
-  const NOT_PAGES = new Set(["/admin", "/organisation"])
+  const NOT_PAGES = new Set(["/admin", "/organisation", "/store"])
   const breadcrumbs = pathSegments.map((segment, index) => {
     const href = "/" + pathSegments.slice(0, index + 1).join("/")
     const label = segment.charAt(0).toUpperCase() + segment.slice(1)

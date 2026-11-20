@@ -30,6 +30,8 @@ export type AppUser = {
   jobTitle: string
   roles: UserRoleAssignment[]
   groups: { uniqueId: string; code: string; name: string }[]
+  creationApprovalStatus: string | null
+  creationApprovalUniqueId: string | null
 }
 
 const USER = /* GraphQL */ `
@@ -45,6 +47,8 @@ const USER = /* GraphQL */ `
   jobTitle
   roles { roleUniqueId roleName contextType contextUniqueId contextName }
   groups { uniqueId code name }
+  creationApprovalStatus
+  creationApprovalUniqueId
 `
 
 export type UserFilter = {

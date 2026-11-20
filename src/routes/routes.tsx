@@ -13,6 +13,30 @@ import {
   fetchRoles,
 } from "@/services/access"
 import { fetchPolicySettings } from "@/services/admin"
+import { fetchReports } from "@/services/reports"
+import {
+  fetchApprovalPoint,
+  fetchApprovalPoints,
+  fetchApprovalRequest,
+  fetchExitClearance,
+  fetchExitClearances,
+} from "@/services/workflow"
+import {
+  fetchCategories,
+  fetchProduct,
+  fetchProducts,
+  type ProductStatus,
+} from "@/services/products"
+import {
+  fetchAdjustment,
+  fetchAdjustments,
+  fetchAsset,
+  fetchAssets,
+  fetchStockLevels,
+  fetchStore,
+  fetchStores,
+  type AssetStatus,
+} from "@/services/store"
 import { AUTH_ROUTES, ROUTES } from "./routeConstants"
 import ProtectedRoute from "./protected-route"
 import PublicOnlyRoute from "./public-only-route"
@@ -104,6 +128,53 @@ export const routes = createBrowserRouter([
             ],
           },
 
+          // ── Approvals (assignment is checked by the API) ───────────────
+          {
+            // Lists only the reports the user's permissions allow.
+            path: ROUTES.REPORTS,
+            loader: async () => ({ reports: await fetchReports() }),
+            lazy: () => lazyPage(() => import("@/pages/reports/reports")),
+          },
+          {
+            path: ROUTES.APPROVALS,
+            lazy: () => lazyPage(() => import("@/pages/approvals/approvals")),
+          },
+          {
+            path: ROUTES.APPROVAL_DETAILS,
+            loader: async ({ params }) => ({
+              request: await fetchApprovalRequest(params.uniqueId!),
+            }),
+            lazy: () =>
+              lazyPage(() => import("@/pages/approvals/approval-details")),
+          },
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[P.EMPLOYEE_EXIT, P.EXIT_CLEARANCE_APPROVE]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.EXIT_CLEARANCES,
+                loader: async () => ({
+                  clearances: await fetchExitClearances(),
+                }),
+                lazy: () =>
+                  lazyPage(() => import("@/pages/employees/exit-clearances")),
+              },
+              {
+                path: ROUTES.EXIT_CLEARANCE_DETAILS,
+                loader: async ({ params }) => ({
+                  clearance: await fetchExitClearance(params.uniqueId!),
+                }),
+                lazy: () =>
+                  lazyPage(
+                    () => import("@/pages/employees/exit-clearance-details")
+                  ),
+              },
+            ],
+          },
+
           // ── Organisation ───────────────────────────────────────────────
           {
             element: (
@@ -169,6 +240,18 @@ export const routes = createBrowserRouter([
             ],
           },
           {
+            element: (
+              <PermissionRoute requiredPermissions={[P.EMPLOYEE_IMPORT]} />
+            ),
+            children: [
+              {
+                path: ROUTES.EMPLOYEE_IMPORT,
+                lazy: () =>
+                  lazyPage(() => import("@/pages/employees/employee-import")),
+              },
+            ],
+          },
+          {
             // Own profile is reachable with own_records; scope checked by API.
             path: ROUTES.EMPLOYEE_DETAILS,
             loader: async ({ params }) => ({
@@ -176,6 +259,243 @@ export const routes = createBrowserRouter([
             }),
             lazy: () =>
               lazyPage(() => import("@/pages/employees/employee-details")),
+          },
+
+          // ── B1 Product Repository ──────────────────────────────────────
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[P.ITEM_VIEW, P.ITEM_CREATE, P.ITEM_MANAGE]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.PRODUCTS,
+                loader: async ({ request }) => {
+                  const params = page(request.url)
+                  const status = params.get("status")
+                  const { page: p, limit } = pageInput(params)
+                  return {
+                    products: await fetchProducts(
+                      {
+                        search: params.get("q") || undefined,
+                        statuses: status
+                          ? [status as ProductStatus]
+                          : undefined,
+                        categoryUniqueId: params.get("category") || undefined,
+                        pendingOnly:
+                          params.get("pending") === "yes" || undefined,
+                      },
+                      p,
+                      limit
+                    ),
+                  }
+                },
+                lazy: () => lazyPage(() => import("@/pages/products/products")),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute requiredPermissions={[P.ITEM_CREATE]} />,
+            children: [
+              {
+                path: ROUTES.PRODUCT_NEW,
+                loader: async () => ({
+                  product: null,
+                  categories: await fetchCategories(),
+                }),
+                lazy: () =>
+                  lazyPage(() => import("@/pages/products/product-form")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute requiredPermissions={[P.ITEM_EDIT_DRAFT]} />
+            ),
+            children: [
+              {
+                path: ROUTES.PRODUCT_EDIT,
+                loader: async ({ params }) => ({
+                  product: await fetchProduct(params.uniqueId!),
+                  categories: await fetchCategories(),
+                }),
+                lazy: () =>
+                  lazyPage(() => import("@/pages/products/product-form")),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute requiredPermissions={[P.ITEM_IMPORT]} />,
+            children: [
+              {
+                path: ROUTES.PRODUCT_IMPORT,
+                lazy: () =>
+                  lazyPage(() => import("@/pages/products/product-import")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute requiredPermissions={[P.ITEM_CATEGORY_MANAGE]} />
+            ),
+            children: [
+              {
+                path: ROUTES.PRODUCT_CATEGORIES,
+                loader: async () => ({
+                  categories: await fetchCategories(true),
+                }),
+                lazy: () =>
+                  lazyPage(() => import("@/pages/products/categories")),
+              },
+            ],
+          },
+          {
+            // Scope (and approver access) checked by the API.
+            path: ROUTES.PRODUCT_DETAILS,
+            loader: async ({ params }) => ({
+              product: await fetchProduct(params.uniqueId!),
+            }),
+            lazy: () =>
+              lazyPage(() => import("@/pages/products/product-details")),
+          },
+
+          // ── B2 Store & Inventory ───────────────────────────────────────
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[P.STORE_MANAGE, P.STOCK_VIEW, P.ASSET_VIEW]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.STORES,
+                loader: async () => ({ stores: await fetchStores(true) }),
+                lazy: () => lazyPage(() => import("@/pages/store/stores")),
+              },
+              {
+                path: ROUTES.STORE_DETAILS,
+                loader: async ({ params }) => ({
+                  store: await fetchStore(params.uniqueId!),
+                  stores: await fetchStores(true),
+                }),
+                lazy: () =>
+                  lazyPage(() => import("@/pages/store/store-details")),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute requiredPermissions={[P.STOCK_VIEW]} />,
+            children: [
+              {
+                path: ROUTES.STOCK,
+                loader: async ({ request }) => {
+                  const params = page(request.url)
+                  const [levels, stores] = await Promise.all([
+                    fetchStockLevels({
+                      storeUniqueId: params.get("store") || undefined,
+                      search: params.get("q") || undefined,
+                      belowReorderOnly:
+                        params.get("below") === "yes" || undefined,
+                    }),
+                    fetchStores(),
+                  ])
+                  return { levels, stores }
+                },
+                lazy: () => lazyPage(() => import("@/pages/store/stock")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute anyPermissions={[P.ASSET_VIEW, P.STOCK_VIEW]} />
+            ),
+            children: [
+              {
+                path: ROUTES.ASSETS,
+                loader: async ({ request }) => {
+                  const params = page(request.url)
+                  const status = params.get("status")
+                  const { page: p, limit } = pageInput(params)
+                  const [assets, stores] = await Promise.all([
+                    fetchAssets(
+                      {
+                        search: params.get("q") || undefined,
+                        storeUniqueId: params.get("store") || undefined,
+                        statuses: status ? [status as AssetStatus] : undefined,
+                        categoryUniqueId: params.get("category") || undefined,
+                        productUniqueId: params.get("product") || undefined,
+                        vehiclesOnly:
+                          params.get("vehicles") === "yes" || undefined,
+                      },
+                      p,
+                      limit
+                    ),
+                    fetchStores(),
+                  ])
+                  return { assets, stores }
+                },
+                lazy: () => lazyPage(() => import("@/pages/store/assets")),
+              },
+            ],
+          },
+          {
+            path: ROUTES.ASSET_DETAILS,
+            loader: async ({ params }) => ({
+              asset: await fetchAsset(params.uniqueId!),
+            }),
+            lazy: () => lazyPage(() => import("@/pages/store/asset-details")),
+          },
+          {
+            element: (
+              <PermissionRoute requiredPermissions={[P.ASSET_TAG_PRINT]} />
+            ),
+            children: [
+              {
+                path: ROUTES.ASSET_TAGS,
+                lazy: () => lazyPage(() => import("@/pages/store/tags")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[P.STOCK_ADJUST, P.STOCK_VIEW, P.STORE_MANAGE]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.ADJUSTMENTS,
+                loader: async () => ({ adjustments: await fetchAdjustments() }),
+                lazy: () => lazyPage(() => import("@/pages/store/adjustments")),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute requiredPermissions={[P.STOCK_ADJUST]} />,
+            children: [
+              {
+                path: ROUTES.ADJUSTMENT_NEW,
+                loader: async () => ({ stores: await fetchStores() }),
+                lazy: () =>
+                  lazyPage(() => import("@/pages/store/adjustment-form")),
+              },
+              {
+                path: ROUTES.OPENING_BALANCE,
+                loader: async () => ({ stores: await fetchStores() }),
+                lazy: () =>
+                  lazyPage(() => import("@/pages/store/opening-balance")),
+              },
+            ],
+          },
+          {
+            // Creator, store staff and approvers; checked by the API.
+            path: ROUTES.ADJUSTMENT_DETAILS,
+            loader: async ({ params }) => ({
+              adjustment: await fetchAdjustment(params.uniqueId!),
+            }),
+            lazy: () =>
+              lazyPage(() => import("@/pages/store/adjustment-details")),
           },
 
           // ── Access administration ──────────────────────────────────────
@@ -250,6 +570,25 @@ export const routes = createBrowserRouter([
                 path: ROUTES.POLICIES,
                 loader: async () => ({ settings: await fetchPolicySettings() }),
                 lazy: () => lazyPage(() => import("@/pages/admin/policies")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute requiredPermissions={[P.WORKFLOW_VIEW]} />
+            ),
+            children: [
+              {
+                path: ROUTES.WORKFLOWS,
+                loader: async () => ({ points: await fetchApprovalPoints() }),
+                lazy: () => lazyPage(() => import("@/pages/admin/workflows")),
+              },
+              {
+                path: ROUTES.WORKFLOW_DETAILS,
+                loader: async ({ params }) =>
+                  fetchApprovalPoint(params.uniqueId!),
+                lazy: () =>
+                  lazyPage(() => import("@/pages/admin/workflow-editor")),
               },
             ],
           },

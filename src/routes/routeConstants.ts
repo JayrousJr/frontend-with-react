@@ -9,11 +9,17 @@ export const ROUTES = {
   DASHBOARD: "/dashboard",
   SETTINGS: "/settings",
   DELEGATIONS: "/delegations",
+  APPROVALS: "/approvals",
+  REPORTS: "/reports",
+  APPROVAL_DETAILS: "/approvals/:uniqueId",
+  EXIT_CLEARANCES: "/exit-clearances",
+  EXIT_CLEARANCE_DETAILS: "/exit-clearances/:uniqueId",
 
   // A1 — organisation & people
   DEPARTMENTS: "/organisation/departments",
   LOOKUPS: "/organisation/lists",
   EMPLOYEES: "/employees",
+  EMPLOYEE_IMPORT: "/employees/import",
   EMPLOYEE_DETAILS: "/employees/:uniqueId",
 
   // A1 — access administration
@@ -24,6 +30,29 @@ export const ROUTES = {
   GROUPS: "/admin/groups",
   POLICIES: "/admin/policies",
   AUDIT_LOG: "/admin/audit",
+  WORKFLOWS: "/admin/workflows",
+  /** :uniqueId carries the approval point code. */
+  WORKFLOW_DETAILS: "/admin/workflows/:uniqueId",
+
+  // B1 — Product Repository
+  PRODUCTS: "/products",
+  PRODUCT_NEW: "/products/new",
+  PRODUCT_IMPORT: "/products/import",
+  PRODUCT_CATEGORIES: "/products/categories",
+  PRODUCT_DETAILS: "/products/:uniqueId",
+  PRODUCT_EDIT: "/products/:uniqueId/edit",
+
+  // B2 — Store & Inventory
+  STORES: "/store/stores",
+  STORE_DETAILS: "/store/stores/:uniqueId",
+  STOCK: "/store/stock",
+  ASSETS: "/store/assets",
+  ASSET_DETAILS: "/store/assets/:uniqueId",
+  ASSET_TAGS: "/store/tags",
+  ADJUSTMENTS: "/store/adjustments",
+  ADJUSTMENT_NEW: "/store/adjustments/new",
+  ADJUSTMENT_DETAILS: "/store/adjustments/:uniqueId",
+  OPENING_BALANCE: "/store/opening-balance",
 
   // Error
   NOT_FOUND: "/404",

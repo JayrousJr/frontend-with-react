@@ -1,8 +1,10 @@
+import { useEffect, useState } from "react"
 import { Link } from "react-router"
 import { useTranslation } from "react-i18next"
 import {
   Building2Icon,
   ChevronRightIcon,
+  InboxIcon,
   KeyRoundIcon,
   ScrollTextIcon,
   ShieldCheckIcon,
@@ -22,6 +24,7 @@ import { PageHeader } from "@/components/app/page-header"
 import { useAuth } from "@/context/auth-context"
 import { P, hasPermission } from "@/lib/permissions"
 import { ROUTES, withId } from "@/routes/routeConstants"
+import { fetchMyApprovalTasks } from "@/services/workflow"
 
 type Shortcut = {
   title: string
@@ -34,6 +37,12 @@ type Shortcut = {
 const DashboardPage = () => {
   const { t } = useTranslation()
   const { user } = useAuth()
+  const [pending, setPending] = useState<number | null>(null)
+  useEffect(() => {
+    void fetchMyApprovalTasks()
+      .then((r) => setPending(r.length))
+      .catch(() => setPending(null))
+  }, [])
   if (!user) return null
 
   const shortcuts: Shortcut[] = [
@@ -106,6 +115,25 @@ const DashboardPage = () => {
         })}
         description={`${user.jobTitle} · ${user.department.name}`}
       />
+
+      {pending !== null && pending > 0 && (
+        <Link
+          to={ROUTES.APPROVALS}
+          className="flex items-center gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 transition-colors hover:bg-amber-500/15"
+        >
+          <InboxIcon className="size-5 text-amber-700 dark:text-amber-400" />
+          <span className="flex-1 font-medium">
+            {t(
+              "dashboard.pending_approvals",
+              "{{count}} requests are waiting for your decision",
+              {
+                count: pending,
+              }
+            )}
+          </span>
+          <ChevronRightIcon className="size-4" />
+        </Link>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">

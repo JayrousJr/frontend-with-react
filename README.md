@@ -8,14 +8,24 @@ pnpm install
 pnpm dev               # backend CORS allows http://localhost:5173 and :4173
 ```
 
-A1 screens: dashboard, my account (profile, password, sessions, my access),
+A1 screens: dashboard, my account (profile, password & 2FA, sessions, my access),
+my approvals (inbox + request detail), delegations, reports, employee import,
+exit clearances, approval chains (editor with versions),
 departments (HOD, deputy, acting HOD), job titles & employment types,
 employees (directory, profile, history, status/exit/rehire, driver profile),
 users (create from employees, roles with context, lifecycle, login history),
 roles (role builder with scopes), groups, SoD & security settings, audit log.
 
+Product Repository (B1 §5): products list, create/edit with "search before
+create", specs and receiving criteria, product page (versions, Procurement
+activation fields, status, ownership transfer, merge), categories, Excel import.
+Store (B2 basics): stock levels and movements, asset register with tag scan,
+asset page (kit, vehicle, history, QR tag), asset tags (issue + print),
+adjustments (found/donated/correction) and the opening-balance import, stores
+and locations with stock levels. Store roles are assigned per store on the user page.
+
 - Permissions only — `P` constants in `src/lib/permissions.ts` mirror the backend catalogue; there is **no admin bypass** and no role-name checks.
-- Domain services: `src/services/{org,employees,users,access,admin,auth}.ts` (GraphQL documents live next to their service).
+- Domain services: `src/services/{org,employees,users,access,admin,auth,products,store}.ts` (GraphQL documents live next to their service).
 - UI strings use translation keys with English defaults inline (`t("key", "Default")`); add `sw` translations under `src/config/locales/sw/`.
 - Dates are shown DD/MM/YYYY in EAT (`formatDay`, `formatStamp` in `src/lib/format.ts`).
 
