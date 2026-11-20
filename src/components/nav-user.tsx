@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,25 +23,28 @@ import {
 import { useAuth } from "@/context/auth-context"
 import { useNavigate } from "react-router"
 import { ROUTES } from "@/routes/routeConstants"
-import { useAuthenticatedImage } from "@/hooks/use-authenticated-image"
 import { useTranslation } from "react-i18next"
-import { userImg } from "@/lib/exports"
 
 export function NavUser() {
   const { isMobile } = useSidebar()
   const { user, logout } = useAuth()
   const navigate = useNavigate()
-  const avatarSrc = useAuthenticatedImage(user?.avatar)
   const { t } = useTranslation()
 
   if (!user) return null
 
-  const fullName = `${user.firstName} ${user.lastName}`
-  const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
+  const fullName = user.fullName
+  const initials = fullName
+    .split(" ")
+    .filter(Boolean)
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase()
 
   async function handleLogout() {
     await logout()
-    navigate(ROUTES.HOME, { replace: true })
+    navigate(ROUTES.LOGIN, { replace: true })
   }
   return (
     <SidebarMenu>
@@ -53,10 +56,6 @@ export function NavUser() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage
-                  alt={fullName}
-                  src={avatarSrc === undefined ? userImg : avatarSrc}
-                />
                 <AvatarFallback className="rounded-lg">
                   {initials}
                 </AvatarFallback>
@@ -77,10 +76,6 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage
-                    alt={fullName}
-                    src={avatarSrc === undefined ? userImg : avatarSrc}
-                  />
                   <AvatarFallback className="rounded-lg">
                     {initials}
                   </AvatarFallback>

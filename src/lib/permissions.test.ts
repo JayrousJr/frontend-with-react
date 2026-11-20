@@ -1,70 +1,94 @@
 import { describe, expect, it } from "vitest"
 import {
-  PERMISSIONS,
-  hasPermission,
+  P,
+  hasAnyPermission,
   hasEveryPermission,
-  groupPermissionsByDomain,
+  hasPermission,
+  scopesFor,
 } from "./permissions"
 import type { User } from "@/context/auth-context"
 
 function makeUser(overrides: Partial<User> = {}): User {
   return {
     uniqueId: "u1",
-    email: "user@example.com",
-    firstName: "Test",
-    lastName: "User",
-    role: "user",
+    email: "user@azamtv.co.tz",
+    fullName: "Test User",
+    employeeUniqueId: "e1",
+    employeeNumber: "AZ0001",
+    department: { uniqueId: "d1", code: "ICT", name: "ICT" },
+    jobTitle: "Officer",
+    roles: [
+      {
+        roleUniqueId: "r1",
+        roleName: "System Administrator",
+        contextName: null,
+      },
+    ],
     permissions: [],
+    grants: [],
     preferredLocale: "en",
     ...overrides,
-  } as User
+  }
 }
 
 describe("hasPermission", () => {
   it("denies when there is no user", () => {
-    expect(hasPermission(null, PERMISSIONS.USERS.READ)).toBe(false)
+    expect(hasPermission(null, P.USER_VIEW)).toBe(false)
   })
 
-  it("bypasses the check entirely for admins, mirroring the backend guard", () => {
-    const admin = makeUser({ role: "admin", permissions: [] })
-    expect(hasPermission(admin, PERMISSIONS.ROLES.MANAGE)).toBe(true)
+  it("never bypasses on a role name", () => {
+    const admin = makeUser({ permissions: [] })
+    expect(hasPermission(admin, P.ROLE_MANAGE)).toBe(false)
   })
 
-  it("grants when the permission is present", () => {
-    const user = makeUser({ permissions: [PERMISSIONS.USERS.READ] })
-    expect(hasPermission(user, PERMISSIONS.USERS.READ)).toBe(true)
-  })
-
-  it("denies when the permission is missing", () => {
-    const user = makeUser({ permissions: [PERMISSIONS.USERS.READ] })
-    expect(hasPermission(user, PERMISSIONS.USERS.DELETE)).toBe(false)
+  it("allows when the permission is held", () => {
+    const u = makeUser({ permissions: [P.EMPLOYEE_VIEW] })
+    expect(hasPermission(u, P.EMPLOYEE_VIEW)).toBe(true)
   })
 })
 
-describe("hasEveryPermission", () => {
-  it("requires all listed permissions (AND, not OR)", () => {
-    const user = makeUser({ permissions: [PERMISSIONS.ROLES.READ] })
-    expect(
-      hasEveryPermission(user, [
-        PERMISSIONS.ROLES.READ,
-        PERMISSIONS.PERMISSIONS.READ,
-      ])
-    ).toBe(false)
+describe("hasEveryPermission / hasAnyPermission", () => {
+  const u = makeUser({ permissions: [P.USER_VIEW, P.USER_MANAGE] })
+
+  it("requires all for every", () => {
+    expect(hasEveryPermission(u, [P.USER_VIEW, P.USER_MANAGE])).toBe(true)
+    expect(hasEveryPermission(u, [P.USER_VIEW, P.ROLE_MANAGE])).toBe(false)
+    expect(hasEveryPermission(u, [])).toBe(true)
   })
 
-  it("passes an empty requirement list", () => {
-    expect(hasEveryPermission(makeUser(), [])).toBe(true)
+  it("requires one for any", () => {
+    expect(hasAnyPermission(u, [P.ROLE_MANAGE, P.USER_VIEW])).toBe(true)
+    expect(hasAnyPermission(u, [P.ROLE_MANAGE])).toBe(false)
   })
 })
 
-describe("groupPermissionsByDomain", () => {
-  it("groups by the dot-prefixed domain", () => {
-    const grouped = groupPermissionsByDomain([
-      { name: "users.read" },
-      { name: "users.delete" },
-      { name: "roles.manage" },
-    ])
-    expect(grouped.users).toHaveLength(2)
-    expect(grouped.roles).toHaveLength(1)
+describe("scopesFor", () => {
+  it("lists distinct scopes held for a permission", () => {
+    const u = makeUser({
+      grants: [
+        {
+          permission: P.EMPLOYEE_VIEW,
+          scope: "OWN_DEPARTMENT",
+          contextType: null,
+          contextId: null,
+          delegated: false,
+        },
+        {
+          permission: P.EMPLOYEE_VIEW,
+          scope: "OWN_DEPARTMENT",
+          contextType: null,
+          contextId: null,
+          delegated: true,
+        },
+        {
+          permission: P.AUDIT_VIEW,
+          scope: "ALL",
+          contextType: null,
+          contextId: null,
+          delegated: false,
+        },
+      ],
+    })
+    expect(scopesFor(u, P.EMPLOYEE_VIEW)).toEqual(["OWN_DEPARTMENT"])
   })
 })

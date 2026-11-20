@@ -1,3 +1,28 @@
+# AzamTV Management — Frontend
+
+React 19 + Vite + shadcn/ui. Talks to `../backend` (GraphQL + REST auth).
+
+```bash
+cp .env.example .env   # VITE_API_URL / VITE_GRAPHQL_URL → backend (default port 3005)
+pnpm install
+pnpm dev               # backend CORS allows http://localhost:5173 and :4173
+```
+
+A1 screens: dashboard, my account (profile, password, sessions, my access),
+departments (HOD, deputy, acting HOD), job titles & employment types,
+employees (directory, profile, history, status/exit/rehire, driver profile),
+users (create from employees, roles with context, lifecycle, login history),
+roles (role builder with scopes), groups, SoD & security settings, audit log.
+
+- Permissions only — `P` constants in `src/lib/permissions.ts` mirror the backend catalogue; there is **no admin bypass** and no role-name checks.
+- Domain services: `src/services/{org,employees,users,access,admin,auth}.ts` (GraphQL documents live next to their service).
+- UI strings use translation keys with English defaults inline (`t("key", "Default")`); add `sw` translations under `src/config/locales/sw/`.
+- Dates are shown DD/MM/YYYY in EAT (`formatDay`, `formatStamp` in `src/lib/format.ts`).
+
+---
+
+_The sections below come from the original template; parts about registration, Google sign-in, the landing page, blog/SEO, campaigns and analytics no longer apply._
+
 # React Frontend Template
 
 A React 19 + Vite + TypeScript frontend template built for **security, RBAC, and performance**. Pairs with the [NestJS GraphQL backend template](../backend/nestjs-graphql-template) — the two are designed to be cloned and run together.

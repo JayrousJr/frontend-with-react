@@ -1,5 +1,5 @@
 {
-  "name": "frontend-react-template",
+  "name": "azamtv-management-frontend",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -13,8 +13,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepare": "husky",
-    "prerender": "node scripts/prerender.mjs"
+    "prepare": "husky"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -38,6 +37,7 @@
     "lucide-react": "^0.577.0",
     "motion": "^12.42.2",
     "next-themes": "^0.4.6",
+    "qrcode": "1.5.4",
     "radix-ui": "^1.6.7",
     "react": "^19.3.0",
     "react-day-picker": "^10.0.1",
@@ -63,6 +63,7 @@
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",
     "@types/node": "^24.12.0",
+    "@types/qrcode": "1.5.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^5.2.0",

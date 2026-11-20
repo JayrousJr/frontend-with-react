@@ -1,27 +1,51 @@
 /* eslint-disable react-refresh/only-export-components */
 import * as React from "react"
-import { api, setAccessToken } from "@/services/api"
+import { api, refreshAccessToken, setAccessToken } from "@/services/api"
 import { disconnectSocket } from "@/lib/socket"
 import { fetchMe } from "@/services/auth"
 import i18next from "i18next"
 
-export type UserRole = "admin" | "user" | "manager"
 /**
- * Fine-grained authorization unit, e.g. "users.delete", "products.read".
- * Backend-provided — the frontend only ever checks membership, never derives
- * permissions from role. Role stays a coarse label for nav/grouping/defaults.
+ * A permission code from the backend catalogue, e.g. "employee.manage".
+ * The frontend only ever checks membership; scopes are enforced by the
+ * backend on every record. There are no role-name checks anywhere.
  */
 export type Permission = string
+
+export type Scope =
+  | "ALL"
+  | "OWN_DEPARTMENT"
+  | "OWN_RECORDS"
+  | "ASSIGNED"
+  | "ASSIGNED_STORE"
+  | "ASSIGNED_PRODUCTION"
+  | "OWN_VENDOR"
+
+export type Grant = {
+  permission: Permission
+  scope: Scope
+  contextType: "STORE" | "DEPARTMENT" | null
+  contextId: number | null
+  delegated: boolean
+}
 
 export type User = {
   uniqueId: string
   email: string
-  firstName: string
-  lastName: string
-  role: UserRole
+  fullName: string
+  employeeUniqueId: string
+  employeeNumber: string
+  department: { uniqueId: string; code: string; name: string }
+  jobTitle: string
+  roles: {
+    roleUniqueId: string
+    roleName: string
+    contextName: string | null
+  }[]
+  /** Distinct permission codes held with any scope. */
   permissions: Permission[]
-  avatar: string | null
-  preferredLocale?: string
+  grants: Grant[]
+  preferredLocale: string
 }
 
 type AuthContextValue = {
@@ -39,9 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = React.useState(true)
   const [user, setUser] = React.useState<User | null>(null)
 
-  // Single owner of locale sync: whenever the profile's preferred locale
-  // changes (login, refreshUser after a profile update), apply it to i18next
-  // and persist it so the next page load starts in the right language.
+  // Single owner of locale sync: apply the profile's preferred locale.
   React.useEffect(() => {
     if (user?.preferredLocale) {
       void i18next.changeLanguage(user.preferredLocale)
@@ -52,27 +74,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     async function validateSession() {
       try {
-        if (import.meta.env.VITE_AUTH_STRATEGY === "session") {
-          await api.get("/auth/me")
-          setUser(await fetchMe())
-        } else {
-          // The refresh token is an HttpOnly cookie the browser attaches
-          // itself — there is nothing to read or send from JS. A 401 here
-          // simply means no (or an expired) session.
-          const { data } = await api.post<{ accessToken: string }>(
-            "/auth/refresh"
-          )
-          setAccessToken(data.accessToken)
-          setUser(await fetchMe())
-        }
+        // The refresh token is an HttpOnly cookie. Shares one in-flight
+        // request with any route loader doing the same on a deep link —
+        // two parallel refreshes would revoke each other (token rotation).
+        if (await refreshAccessToken()) setUser(await fetchMe())
       } catch {
         // No valid session — user stays unauthenticated
       } finally {
         setIsLoading(false)
       }
     }
-
     void validateSession()
+  }, [])
+
+  // The API layer signals a session that can no longer be refreshed.
+  React.useEffect(() => {
+    const onExpired = () => {
+      setAccessToken("")
+      disconnectSocket()
+      setUser(null)
+    }
+    window.addEventListener("auth:expired", onExpired)
+    return () => window.removeEventListener("auth:expired", onExpired)
   }, [])
 
   const login = React.useCallback(async (accessToken: string) => {
@@ -81,7 +104,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const logout = React.useCallback(async () => {
-    // The cookie identifies the session; the backend revokes it and clears it.
     try {
       await api.post("/auth/logout")
     } catch {

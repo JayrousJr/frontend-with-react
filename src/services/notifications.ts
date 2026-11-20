@@ -1,9 +1,51 @@
 import { gql } from "./api"
-import { GET_MY_NOTIFICATIONS } from "./queries"
-import {
-  MARK_ALL_NOTIFICATIONS_READ,
-  MARK_NOTIFICATION_READ,
-} from "./mutations"
+
+const GET_MY_NOTIFICATIONS = /* GraphQL */ `
+  query GetMyNotifications(
+    $pagination: PaginationInput
+    $filter: NotificationFilterInput
+  ) {
+    getMyNotifications(pagination: $pagination, filter: $filter) {
+      data {
+        uniqueId
+        type
+        titleKey
+        messageKey
+        params
+        link
+        readAt
+        createdAt
+      }
+      total
+      page
+      limit
+      totalPages
+      hasNextPage
+      hasPrevPage
+      unreadCount
+    }
+  }
+`
+
+const MARK_NOTIFICATION_READ = /* GraphQL */ `
+  mutation MarkNotificationRead($uniqueId: String!) {
+    markNotificationRead(uniqueId: $uniqueId) {
+      data {
+        uniqueId
+        readAt
+      }
+      message
+    }
+  }
+`
+
+const MARK_ALL_NOTIFICATIONS_READ = /* GraphQL */ `
+  mutation MarkAllNotificationsRead {
+    markAllNotificationsRead {
+      message
+    }
+  }
+`
 
 // Types
 

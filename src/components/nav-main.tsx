@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar"
 import { navMain, type NavMainItem } from "@/lib/exports"
 import { useAuth } from "@/context/auth-context"
-import { hasEveryPermission } from "@/lib/permissions"
+import { hasAnyPermission, hasEveryPermission } from "@/lib/permissions"
 import { ChevronRightIcon } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router"
@@ -24,12 +24,15 @@ export function NavMain() {
   const { t } = useTranslation()
   const { user } = useAuth()
 
-  // Hide entries the user has no permission for (admin bypasses, mirroring
+  // Hide entries the user has no permission for (no admin bypass, mirroring
   // the backend guard). A group with all of its children hidden disappears.
   const visibleNav = navMain
     .map((item): NavMainItem => {
-      const items = item.items?.filter((subItem) =>
-        hasEveryPermission(user, subItem.requiredPermissions ?? [])
+      const items = item.items?.filter(
+        (subItem) =>
+          hasEveryPermission(user, subItem.requiredPermissions ?? []) &&
+          (!subItem.anyPermissions ||
+            hasAnyPermission(user, subItem.anyPermissions))
       )
       return { ...item, items }
     })
@@ -41,7 +44,7 @@ export function NavMain() {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>{t("dashboards.navMain.title")}</SidebarGroupLabel>
+      <SidebarGroupLabel>{t("nav.title", "AzamTV")}</SidebarGroupLabel>
       <SidebarMenu>
         {visibleNav.map((item) => (
           <Collapsible

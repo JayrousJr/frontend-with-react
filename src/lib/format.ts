@@ -536,3 +536,36 @@ export function buildImageUrl(uri: string | null | undefined): string | null {
   if (uri.startsWith("http://") || uri.startsWith("https://")) return uri
   return `${API_URL}/files/download/${uri.replace(/^\//, "")}`
 }
+
+/** AzamTV display rules: time zone EAT, dates DD/MM/YYYY. */
+const EAT = "Africa/Dar_es_Salaam"
+
+/** "18/11/2026" — date-only values (start dates, expiries). */
+export function formatDay(date: string | Date | null | undefined): string {
+  if (!date) return "—"
+  const d = typeof date === "string" ? new Date(date) : date
+  if (isNaN(d.getTime())) return "—"
+  // Date-only fields arrive as UTC midnight; format them in UTC so they
+  // never shift a day. Timestamps use formatStamp below.
+  return d.toLocaleDateString("en-GB", { timeZone: "UTC" })
+}
+
+/** "18/11/2026, 14:05" in EAT — timestamps (logins, audit entries). */
+export function formatStamp(date: string | Date | null | undefined): string {
+  if (!date) return "—"
+  const d = typeof date === "string" ? new Date(date) : date
+  if (isNaN(d.getTime())) return "—"
+  return d.toLocaleString("en-GB", {
+    timeZone: EAT,
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+}
+
+/** yyyy-mm-dd for <input type="date"> from an ISO value. */
+export function toDateInput(date: string | null | undefined): string {
+  return date ? date.slice(0, 10) : ""
+}

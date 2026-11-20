@@ -1,58 +1,46 @@
-import type { Permission, User } from "@/context/auth-context"
+import type { Permission, Scope, User } from "@/context/auth-context"
 
 /**
- * Frontend mirror of the backend permission catalog
- * (backend: src/permissions/permission.constants.ts). Use these constants
- * instead of magic strings when gating routes or UI.
+ * Frontend mirror of the backend permission catalogue
+ * (backend: src/access/catalogue). Use these constants instead of magic
+ * strings when gating routes or UI. Add each module's codes as it is built.
  */
-export const PERMISSIONS = {
-  USERS: {
-    CREATE: "users.create",
-    READ: "users.read",
-    UPDATE: "users.update",
-    DELETE: "users.delete",
-  },
-  ROLES: {
-    READ: "roles.read",
-    MANAGE: "roles.manage",
-  },
-  PERMISSIONS: {
-    READ: "permissions.read",
-    MANAGE: "permissions.manage",
-  },
-  CAMPAIGNS: {
-    READ: "campaigns.read",
-    MANAGE: "campaigns.manage",
-  },
-  NEWSLETTER: {
-    READ: "newsletter.read",
-  },
-  FILES: {
-    READ: "files.read",
-    DELETE: "files.delete",
-  },
-  ANALYTICS: {
-    READ: "analytics.read",
-  },
-  CONTENT: {
-    READ: "content.read",
-    MANAGE: "content.manage",
-  },
-  SEO: {
-    MANAGE: "seo.manage",
-  },
+export const P = {
+  DEPARTMENT_VIEW: "department.view",
+  DEPARTMENT_MANAGE: "department.manage",
+  JOB_TITLE_MANAGE: "job_title.manage",
+  EMPLOYMENT_TYPE_MANAGE: "employment_type.manage",
+  EMPLOYEE_VIEW: "employee.view",
+  EMPLOYEE_VIEW_PERSONAL: "employee.view_personal",
+  EMPLOYEE_MANAGE: "employee.manage",
+  EMPLOYEE_IMPORT: "employee.import",
+  EMPLOYEE_EXIT: "employee.exit",
+  DRIVER_PROFILE_MANAGE: "driver_profile.manage",
+  USER_VIEW: "user.view",
+  USER_MANAGE: "user.manage",
+  USER_ASSIGN_ROLE: "user.assign_role",
+  USER_RESET_PASSWORD: "user.reset_password",
+  ROLE_VIEW: "role.view",
+  ROLE_MANAGE: "role.manage",
+  GROUP_MANAGE: "group.manage",
+  POLICY_VIEW: "policy.view",
+  POLICY_MANAGE: "policy.manage",
+  AUDIT_VIEW: "audit.view",
+  DELEGATION_CREATE: "delegation.create",
+  DELEGATION_APPROVE: "delegation.approve",
+  SECURITY_VIEW_LOGINS: "security.view_logins",
 } as const
 
 /**
- * Membership check mirroring the backend PermissionsGuard: the admin role
- * bypasses permission checks entirely, everyone else must hold the permission.
+ * Whether the user holds the permission with any scope. The backend still
+ * checks the scope against every record; this only decides what to show.
+ * No admin bypass — permissions are the foundation, never role names.
  */
 export function hasPermission(
   user: User | null,
   permission: Permission
 ): boolean {
   if (!user) return false
-  if (user.role === "admin") return true
   return user.permissions.includes(permission)
 }
 
@@ -63,13 +51,29 @@ export function hasEveryPermission(
   return permissions.every((permission) => hasPermission(user, permission))
 }
 
-/** Group flat permission names by their domain prefix (e.g. "users"). */
-export function groupPermissionsByDomain<T extends { name: string }>(
-  permissions: T[]
+export function hasAnyPermission(
+  user: User | null,
+  permissions: Permission[]
+): boolean {
+  return permissions.some((permission) => hasPermission(user, permission))
+}
+
+/** Scopes the user holds for a permission (e.g. to hide a department filter). */
+export function scopesFor(user: User | null, permission: Permission): Scope[] {
+  if (!user) return []
+  return [
+    ...new Set(
+      user.grants.filter((g) => g.permission === permission).map((g) => g.scope)
+    ),
+  ]
+}
+
+/** Group flat permission codes by module, keeping order. */
+export function groupByModule<T extends { module: string }>(
+  items: T[]
 ): Record<string, T[]> {
-  return permissions.reduce<Record<string, T[]>>((groups, permission) => {
-    const domain = permission.name.split(".")[0] ?? "other"
-    ;(groups[domain] ??= []).push(permission)
+  return items.reduce<Record<string, T[]>>((groups, item) => {
+    ;(groups[item.module] ??= []).push(item)
     return groups
   }, {})
 }

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import {
   DropdownMenu,
@@ -8,28 +7,18 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
 import { Button } from "./ui/button"
-import { fetchSupportedLocales, updateProfile } from "@/services/account"
+import { updateMyLocale } from "@/services/auth"
 import { useAuth } from "@/context/auth-context"
 import { languageLogos } from "@/config/languageLogos"
 import { toast } from "sonner"
 
+/** UI languages: English (default) and Swahili. */
+const SUPPORTED_LOCALES = ["en", "sw"]
+
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation()
-  const [locales, setLocale] = useState<string[]>([])
+  const locales = SUPPORTED_LOCALES
   const { refreshUser, user } = useAuth()
-
-  // 1. Fetch available backend locales on mount
-  useEffect(() => {
-    async function load() {
-      try {
-        const localeData = await fetchSupportedLocales()
-        setLocale(localeData)
-      } catch (error) {
-        console.error("Failed to load locales", error)
-      }
-    }
-    void load()
-  }, [])
 
   // AuthProvider owns syncing i18n to user.preferredLocale — here we only
   // read the active language and handle explicit switches
@@ -43,12 +32,8 @@ const LanguageSwitcher = () => {
     if (!user) return
 
     try {
-      const res = await updateProfile({
-        uniqueId: user.uniqueId,
-        preferredLocale: language,
-      })
+      await updateMyLocale(language)
       await refreshUser()
-      toast.success(res.updateUser.message)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "An error occurred")
     }

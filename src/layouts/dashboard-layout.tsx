@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
 import { Moon, Sun } from "lucide-react"
-import { Outlet, useLocation, useNavigation } from "react-router"
+import { Link, Outlet, useLocation, useNavigation } from "react-router"
 
 const DashboardLayout = () => {
   const navigation = useNavigation()
@@ -28,10 +28,12 @@ const DashboardLayout = () => {
 
   const isLoading = navigation.state === "loading"
   const pathSegments = pathname.split("/").filter(Boolean)
+  // Grouping segments (/admin, /organisation) are not pages of their own.
+  const NOT_PAGES = new Set(["/admin", "/organisation"])
   const breadcrumbs = pathSegments.map((segment, index) => {
     const href = "/" + pathSegments.slice(0, index + 1).join("/")
     const label = segment.charAt(0).toUpperCase() + segment.slice(1)
-    return { href, label }
+    return { href, label, linkable: !NOT_PAGES.has(href) }
   })
   const { theme, setTheme } = useTheme()
   return (
@@ -58,17 +60,19 @@ const DashboardLayout = () => {
                     <div key={crumb.href} className="flex items-center gap-2">
                       {index > 0 && <BreadcrumbSeparator />}
                       <BreadcrumbItem>
-                        {index === breadcrumbs.length - 1 ? (
+                        {index === breadcrumbs.length - 1 || !crumb.linkable ? (
                           <BreadcrumbPage className="truncate">
                             {crumb.label.length > 20
                               ? crumb.label.substring(0, 6) + "..."
                               : crumb.label}
                           </BreadcrumbPage>
                         ) : (
-                          <BreadcrumbLink href={crumb.href}>
-                            {crumb.label.length > 20
-                              ? crumb.label.substring(0, 6) + "..."
-                              : crumb.label}
+                          <BreadcrumbLink asChild>
+                            <Link to={crumb.href}>
+                              {crumb.label.length > 20
+                                ? crumb.label.substring(0, 6) + "..."
+                                : crumb.label}
+                            </Link>
                           </BreadcrumbLink>
                         )}
                       </BreadcrumbItem>

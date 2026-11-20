@@ -1,123 +1,45 @@
 import type { ComponentType } from "react"
-import LoadingPage from "@/components/loading-page"
-import { useAuth } from "@/context/auth-context"
+import { createBrowserRouter, Navigate } from "react-router"
 import AuthLayout from "@/layouts/auth-layout"
 import DashboardLayout from "@/layouts/dashboard-layout"
-import LandingLayout from "@/layouts/landing-layout"
-import Home from "@/pages/guests/home"
-import { createBrowserRouter, Navigate } from "react-router"
-import { ROUTES, AUTH_ROUTES } from "./routeConstants"
+import { P } from "@/lib/permissions"
+import { fetchDepartments, fetchLookups } from "@/services/org"
+import { fetchEmployee, fetchEmployees } from "@/services/employees"
+import { fetchUser, fetchUsers } from "@/services/users"
+import {
+  fetchGroups,
+  fetchPermissionCatalogue,
+  fetchRole,
+  fetchRoles,
+} from "@/services/access"
+import { fetchPolicySettings } from "@/services/admin"
+import { AUTH_ROUTES, ROUTES } from "./routeConstants"
 import ProtectedRoute from "./protected-route"
 import PublicOnlyRoute from "./public-only-route"
 import PermissionRoute from "./permission-route"
 import RouterErrorBoundary from "./router-error-boundary"
-import { fetchUser, fetchUsers } from "@/services/users"
-import {
-  fetchCampaign,
-  fetchCampaigns,
-  type CampaignStatus,
-} from "@/services/campaigns"
-import { fetchPageViews, fetchVisitorStats } from "@/services/analytics"
-import { fetchNewsletterSubscribers } from "@/services/newsletter"
-import {
-  fetchPost,
-  fetchPostBySlug,
-  fetchPosts,
-  fetchPublishedPosts,
-  fetchRedirects,
-} from "@/services/content"
-import { articleJsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/seo"
-import type { Post } from "@/services/content"
-import { PERMISSIONS } from "@/lib/permissions"
 
 async function lazyPage(importFn: () => Promise<{ default: ComponentType }>) {
   const mod = await importFn()
   return { Component: mod.default }
 }
 
-/** Root index: the landing page is visible to everyone, logged in or not. */
-// eslint-disable-next-line react-refresh/only-export-components
-function RootIndex() {
-  const { isLoading } = useAuth()
-  if (isLoading) return <LoadingPage />
-  return <Home />
-}
+const page = (url: string) => new URL(url).searchParams
+
+const pageInput = (params: URLSearchParams) => ({
+  page: Number(params.get("page") ?? "1"),
+  limit: Number(params.get("limit") ?? "20"),
+})
 
 export const routes = createBrowserRouter([
-  /** Public routes */
-  {
-    Component: LandingLayout,
-    errorElement: <RouterErrorBoundary />,
-    children: [
-      {
-        index: true,
-        Component: RootIndex,
-        handle: {
-          seo: {
-            title: undefined,
-            description:
-              "A production-ready React, Vite and TypeScript template with authentication, RBAC, dashboards and internationalization built in.",
-            jsonLd: [organizationJsonLd(), websiteJsonLd()],
-          },
-        },
-      },
-      {
-        path: ROUTES.BLOG,
-        loader: async () => ({ posts: await fetchPublishedPosts() }),
-        lazy: () => lazyPage(() => import("@/pages/guests/blog/blog-list")),
-        handle: {
-          seo: { title: "Blog", description: "Latest articles and updates." },
-        },
-      },
-      {
-        path: ROUTES.BLOG_POST,
-        loader: async ({ params }) => ({
-          post: await fetchPostBySlug(params.slug!),
-        }),
-        lazy: () => lazyPage(() => import("@/pages/guests/blog/blog-post")),
-        // Metadata comes from the post itself, so it is derived from loader data.
-        handle: {
-          seo: (data: unknown) => {
-            const post = (data as { post: Post } | undefined)?.post
-            if (!post) return {}
-            return {
-              title: post.metaTitle ?? post.title,
-              description: post.metaDescription ?? post.excerpt ?? undefined,
-              canonical: post.canonicalUrl ?? `/blog/${post.slug}`,
-              image: post.coverImage ?? undefined,
-              type: "article" as const,
-              noindex: post.noIndex,
-              publishedAt: post.publishedAt ?? undefined,
-              modifiedAt: post.updatedAt,
-              jsonLd: articleJsonLd({
-                title: post.title,
-                description: post.metaDescription ?? post.excerpt,
-                path: `/blog/${post.slug}`,
-                image: post.coverImage,
-                publishedAt: post.publishedAt,
-                modifiedAt: post.updatedAt,
-              }),
-            }
-          },
-        },
-      },
-    ],
-  },
-
-  /** OAuth landing — outside PublicOnlyRoute: it starts unauthenticated and
-   *  becomes authenticated mid-page while trading the fragment tokens. */
-  {
-    path: ROUTES.OAUTH_CALLBACK,
-    errorElement: <RouterErrorBoundary />,
-    lazy: () => lazyPage(() => import("@/pages/auth/oauth-callback")),
-  },
+  /** Root: straight to the dashboard (or login, via ProtectedRoute). */
+  { index: true, element: <Navigate to={ROUTES.DASHBOARD} replace /> },
 
   /** Auth routes — blocked for authenticated users */
   {
     path: "auth",
     Component: PublicOnlyRoute,
     errorElement: <RouterErrorBoundary />,
-    // Sign-in flows must never appear in search results.
     handle: { seo: { noindex: true } },
     children: [
       {
@@ -128,8 +50,8 @@ export const routes = createBrowserRouter([
             lazy: () => lazyPage(() => import("@/pages/auth/login")),
           },
           {
-            path: AUTH_ROUTES.REGISTER,
-            lazy: () => lazyPage(() => import("@/pages/auth/register")),
+            path: AUTH_ROUTES.ACTIVATE,
+            lazy: () => lazyPage(() => import("@/pages/auth/activate")),
           },
           {
             path: AUTH_ROUTES.FORGOT_PASSWORD,
@@ -141,11 +63,7 @@ export const routes = createBrowserRouter([
           },
           {
             path: AUTH_ROUTES.RESET_PASSWORD,
-            lazy: async () => {
-              const { default: Component, action } =
-                await import("@/pages/auth/reset-password")
-              return { Component, action }
-            },
+            lazy: () => lazyPage(() => import("@/pages/auth/reset-password")),
           },
         ],
       },
@@ -156,7 +74,6 @@ export const routes = createBrowserRouter([
   {
     Component: ProtectedRoute,
     errorElement: <RouterErrorBoundary />,
-    // Everything behind auth is noindex by default.
     handle: { seo: { noindex: true } },
     children: [
       {
@@ -172,210 +89,176 @@ export const routes = createBrowserRouter([
               lazyPage(() => import("@/pages/dashboard/settings/settings")),
           },
 
-          /** Permission-gated: user management (backend requires users.read) */
           {
             element: (
-              <PermissionRoute requiredPermissions={[PERMISSIONS.USERS.READ]} />
+              <PermissionRoute
+                anyPermissions={[P.DELEGATION_CREATE, P.DELEGATION_APPROVE]}
+              />
             ),
+            children: [
+              {
+                path: ROUTES.DELEGATIONS,
+                lazy: () =>
+                  lazyPage(() => import("@/pages/delegations/delegations")),
+              },
+            ],
+          },
+
+          // ── Organisation ───────────────────────────────────────────────
+          {
+            element: (
+              <PermissionRoute requiredPermissions={[P.DEPARTMENT_VIEW]} />
+            ),
+            children: [
+              {
+                path: ROUTES.DEPARTMENTS,
+                loader: async () => ({
+                  departments: await fetchDepartments(true),
+                }),
+                lazy: () =>
+                  lazyPage(() => import("@/pages/organisation/departments")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[P.JOB_TITLE_MANAGE, P.EMPLOYMENT_TYPE_MANAGE]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.LOOKUPS,
+                loader: async () => fetchLookups(true),
+                lazy: () =>
+                  lazyPage(() => import("@/pages/organisation/lists")),
+              },
+            ],
+          },
+
+          // ── Employees ──────────────────────────────────────────────────
+          {
+            element: (
+              <PermissionRoute requiredPermissions={[P.EMPLOYEE_VIEW]} />
+            ),
+            children: [
+              {
+                path: ROUTES.EMPLOYEES,
+                loader: async ({ request }) => {
+                  const params = page(request.url)
+                  const status = params.get("status")
+                  const hasUser = params.get("user")
+                  return {
+                    employees: await fetchEmployees(
+                      {
+                        search: params.get("q") || undefined,
+                        departmentUniqueId:
+                          params.get("department") || undefined,
+                        statuses: status
+                          ? [status as never]
+                          : ["ACTIVE", "ON_LEAVE", "SUSPENDED"],
+                        hasUser: hasUser ? hasUser === "yes" : undefined,
+                      },
+                      pageInput(params)
+                    ),
+                  }
+                },
+                lazy: () =>
+                  lazyPage(() => import("@/pages/employees/employees")),
+              },
+            ],
+          },
+          {
+            // Own profile is reachable with own_records; scope checked by API.
+            path: ROUTES.EMPLOYEE_DETAILS,
+            loader: async ({ params }) => ({
+              employee: await fetchEmployee(params.uniqueId!),
+            }),
+            lazy: () =>
+              lazyPage(() => import("@/pages/employees/employee-details")),
+          },
+
+          // ── Access administration ──────────────────────────────────────
+          {
+            element: <PermissionRoute requiredPermissions={[P.USER_VIEW]} />,
             children: [
               {
                 path: ROUTES.USERS,
                 loader: async ({ request }) => {
-                  const params = new URL(request.url).searchParams
-                  const page = Number(params.get("page") ?? "1")
-                  const limit = Number(params.get("limit") ?? "10")
+                  const params = page(request.url)
                   const status = params.get("status")
                   return {
                     users: await fetchUsers(
-                      { page, limit },
                       {
-                        email: params.get("q") || undefined,
-                        role: params.get("role") || undefined,
-                        isActive: status ? status === "active" : undefined,
-                      }
+                        search: params.get("q") || undefined,
+                        statuses: status ? [status as never] : undefined,
+                        roleUniqueId: params.get("role") || undefined,
+                      },
+                      pageInput(params)
                     ),
                   }
                 },
-                lazy: () =>
-                  lazyPage(() => import("@/pages/dashboard/users/users")),
+                lazy: () => lazyPage(() => import("@/pages/admin/users")),
               },
               {
                 path: ROUTES.USER_DETAILS,
-                loader: async ({ params }) => {
-                  return { user: await fetchUser(params.uniqueId!) }
-                },
+                loader: async ({ params }) => ({
+                  user: await fetchUser(params.uniqueId!),
+                }),
                 lazy: () =>
-                  lazyPage(
-                    () => import("@/pages/dashboard/users/user-details")
-                  ),
+                  lazyPage(() => import("@/pages/admin/user-details")),
               },
             ],
           },
-
-          /** Permission-gated: role management (backend requires roles.read) */
           {
-            element: (
-              <PermissionRoute requiredPermissions={[PERMISSIONS.ROLES.READ]} />
-            ),
+            element: <PermissionRoute requiredPermissions={[P.ROLE_VIEW]} />,
             children: [
               {
                 path: ROUTES.ROLES,
-                lazy: () =>
-                  lazyPage(() => import("@/pages/dashboard/roles/roles")),
-              },
-            ],
-          },
-
-          /** Permission-gated: newsletter campaigns (backend requires campaigns.read) */
-          {
-            element: (
-              <PermissionRoute
-                requiredPermissions={[PERMISSIONS.CAMPAIGNS.READ]}
-              />
-            ),
-            children: [
-              {
-                path: ROUTES.CAMPAIGNS,
-                loader: async ({ request }) => {
-                  const params = new URL(request.url).searchParams
-                  const page = Number(params.get("page") ?? "1")
-                  const limit = Number(params.get("limit") ?? "10")
-                  return {
-                    campaigns: await fetchCampaigns(
-                      { page, limit },
-                      {
-                        subject: params.get("q") || undefined,
-                        status:
-                          (params.get("status") as CampaignStatus) || undefined,
-                      }
-                    ),
-                  }
-                },
-                lazy: () =>
-                  lazyPage(
-                    () => import("@/pages/dashboard/campaigns/campaigns")
-                  ),
+                loader: async () => ({ roles: await fetchRoles(true) }),
+                lazy: () => lazyPage(() => import("@/pages/admin/roles")),
               },
               {
-                path: ROUTES.CAMPAIGN_DETAILS,
+                path: ROUTES.ROLE_DETAILS,
                 loader: async ({ params }) => {
-                  return { campaign: await fetchCampaign(params.uniqueId!) }
-                },
-                lazy: () =>
-                  lazyPage(
-                    () => import("@/pages/dashboard/campaigns/campaign-details")
-                  ),
-              },
-            ],
-          },
-
-          /** Permission-gated: newsletter subscriber list (backend requires newsletter.read) */
-          {
-            element: (
-              <PermissionRoute
-                requiredPermissions={[PERMISSIONS.NEWSLETTER.READ]}
-              />
-            ),
-            children: [
-              {
-                path: ROUTES.SUBSCRIBERS,
-                loader: async ({ request }) => {
-                  const params = new URL(request.url).searchParams
-                  const page = Number(params.get("page") ?? "1")
-                  const limit = Number(params.get("limit") ?? "10")
-                  const status = params.get("status")
-                  return {
-                    subscribers: await fetchNewsletterSubscribers(
-                      { page, limit },
-                      {
-                        email: params.get("q") || undefined,
-                        isActive: status ? status === "active" : undefined,
-                      }
-                    ),
-                  }
-                },
-                lazy: () =>
-                  lazyPage(
-                    () => import("@/pages/dashboard/subscribers/subscribers")
-                  ),
-              },
-            ],
-          },
-
-          /** Permission-gated: SEO content (backend requires content.read) */
-          {
-            element: (
-              <PermissionRoute
-                requiredPermissions={[PERMISSIONS.CONTENT.READ]}
-              />
-            ),
-            children: [
-              {
-                path: ROUTES.POSTS,
-                loader: async ({ request }) => {
-                  const params = new URL(request.url).searchParams
-                  return {
-                    posts: await fetchPosts(
-                      {
-                        page: Number(params.get("page") ?? "1"),
-                        limit: Number(params.get("limit") ?? "10"),
-                      },
-                      { search: params.get("q") || undefined }
-                    ),
-                  }
-                },
-                lazy: () =>
-                  lazyPage(() => import("@/pages/dashboard/content/posts")),
-              },
-              {
-                path: ROUTES.POST_NEW,
-                lazy: () =>
-                  lazyPage(
-                    () => import("@/pages/dashboard/content/post-editor")
-                  ),
-              },
-              {
-                path: ROUTES.POST_EDIT,
-                loader: async ({ params }) => ({
-                  post: await fetchPost(params.uniqueId!),
-                }),
-                lazy: () =>
-                  lazyPage(
-                    () => import("@/pages/dashboard/content/post-editor")
-                  ),
-              },
-              {
-                path: ROUTES.REDIRECTS,
-                loader: async () => ({ redirects: await fetchRedirects() }),
-                lazy: () =>
-                  lazyPage(() => import("@/pages/dashboard/content/redirects")),
-              },
-            ],
-          },
-
-          /** Permission-gated: visitor analytics (backend requires analytics.read) */
-          {
-            element: (
-              <PermissionRoute
-                requiredPermissions={[PERMISSIONS.ANALYTICS.READ]}
-              />
-            ),
-            children: [
-              {
-                path: ROUTES.VISITORS,
-                loader: async ({ request }) => {
-                  const params = new URL(request.url).searchParams
-                  const page = Number(params.get("page") ?? "1")
-                  const limit = Number(params.get("limit") ?? "10")
-                  const path = params.get("q") || undefined
-                  const [stats, pageViews] = await Promise.all([
-                    fetchVisitorStats({ page, limit }, { path }),
-                    fetchPageViews({ page, limit }, { path }),
+                  const [catalogue, role] = await Promise.all([
+                    fetchPermissionCatalogue(),
+                    params.uniqueId === "new"
+                      ? Promise.resolve(null)
+                      : fetchRole(params.uniqueId!),
                   ])
-                  return { stats, pageViews }
+                  return { catalogue, role }
                 },
-                lazy: () =>
-                  lazyPage(() => import("@/pages/dashboard/visitors/visitors")),
+                lazy: () => lazyPage(() => import("@/pages/admin/role-editor")),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute requiredPermissions={[P.GROUP_MANAGE]} />,
+            children: [
+              {
+                path: ROUTES.GROUPS,
+                loader: async () => ({ groups: await fetchGroups(true) }),
+                lazy: () => lazyPage(() => import("@/pages/admin/groups")),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute requiredPermissions={[P.POLICY_VIEW]} />,
+            children: [
+              {
+                path: ROUTES.POLICIES,
+                loader: async () => ({ settings: await fetchPolicySettings() }),
+                lazy: () => lazyPage(() => import("@/pages/admin/policies")),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute requiredPermissions={[P.AUDIT_VIEW]} />,
+            children: [
+              {
+                path: ROUTES.AUDIT_LOG,
+                lazy: () => lazyPage(() => import("@/pages/admin/audit-log")),
               },
             ],
           },
@@ -386,17 +269,11 @@ export const routes = createBrowserRouter([
 
   /** Error pages */
   {
-    path: ROUTES.NOT_FOUND,
-    lazy: () => lazyPage(() => import("@/pages/errors/not-found")),
-  },
-  {
     path: ROUTES.FORBIDDEN,
     lazy: () => lazyPage(() => import("@/pages/errors/forbidden")),
   },
-
-  /** Catch 404 */
   {
     path: "*",
-    element: <Navigate to={ROUTES.NOT_FOUND} replace />,
+    lazy: () => lazyPage(() => import("@/pages/errors/not-found")),
   },
 ])

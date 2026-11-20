@@ -4,17 +4,15 @@ import type { ComponentType } from "react"
 
 /**
  * Renders the component only if the current user holds every permission in
- * requiredPermissions (admin bypasses, mirroring the backend guard). Returns
- * null otherwise — no redirect, no error, just hidden. The finer-grained
- * sibling of withRole: use this when visibility depends on a specific
- * capability (e.g. "users.delete") rather than a role.
+ * requiredPermissions (any scope; no admin bypass, mirroring the backend
+ * guard). Returns null otherwise — no redirect, no error, just hidden.
  *
  * Use this for inline UI elements (buttons, menu items, sections).
  * For page-level access control use PermissionRoute in the router instead.
  *
  * @example
- * const DeleteButton = withPermission(["users.delete"])(Button)
- * const ExportAction = withPermission(["analytics.read"])(MenuItem)
+ * const DeleteButton = withPermission(["user.manage"])(Button)
+ * const ExportAction = withPermission(["audit.view"])(MenuItem)
  */
 export function withPermission<TProps extends object>(
   requiredPermissions: Permission[]

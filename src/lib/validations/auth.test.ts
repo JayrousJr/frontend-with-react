@@ -1,17 +1,9 @@
 import { describe, expect, it } from "vitest"
 import type { TFunction } from "i18next"
-import { createLoginSchema, createRegisterSchema } from "./auth"
+import { createLoginSchema, createNewPasswordSchema } from "./auth"
 
 // Schemas only pass keys/params through to `t` — echo them for assertions.
 const t = ((key: string) => key) as TFunction
-
-const validRegistration = {
-  firstName: "John",
-  lastName: "Doe",
-  email: "john@example.com",
-  password: "Password123!",
-  confirmPassword: "Password123!",
-}
 
 describe("createLoginSchema", () => {
   const schema = createLoginSchema(t)
@@ -40,41 +32,39 @@ describe("createLoginSchema", () => {
   })
 })
 
-describe("createRegisterSchema", () => {
-  const schema = createRegisterSchema(t)
+describe("createNewPasswordSchema", () => {
+  const schema = createNewPasswordSchema(t)
 
-  it("accepts a valid registration", () => {
-    expect(schema.safeParse(validRegistration).success).toBe(true)
+  it("accepts a policy-compliant password", () => {
+    const r = schema.safeParse({
+      password: "Kilimanjaro-77x",
+      confirmPassword: "Kilimanjaro-77x",
+    })
+    expect(r.success).toBe(true)
   })
 
-  it("enforces the backend's 8-character password minimum", () => {
-    const result = schema.safeParse({
-      ...validRegistration,
-      password: "short",
-      confirmPassword: "short",
+  it("requires 10 characters", () => {
+    const r = schema.safeParse({
+      password: "Abc12345",
+      confirmPassword: "Abc12345",
     })
-    expect(result.success).toBe(false)
-    expect(result.error?.issues[0].message).toBe("validation.password_min")
+    expect(r.success).toBe(false)
   })
 
-  it("attaches the mismatch error to confirmPassword", () => {
-    const result = schema.safeParse({
-      ...validRegistration,
-      confirmPassword: "Different123!",
+  it("requires letters and numbers", () => {
+    const r = schema.safeParse({
+      password: "onlyletterspass",
+      confirmPassword: "onlyletterspass",
     })
-    expect(result.success).toBe(false)
-    const issue = result.error?.issues[0]
-    expect(issue?.path).toEqual(["confirmPassword"])
-    expect(issue?.message).toBe("auth.passwords_no_match")
+    expect(r.success).toBe(false)
   })
 
-  it("requires first and last name", () => {
-    const result = schema.safeParse({
-      ...validRegistration,
-      firstName: "",
-      lastName: "",
+  it("requires the confirmation to match", () => {
+    const r = schema.safeParse({
+      password: "Kilimanjaro-77x",
+      confirmPassword: "Kilimanjaro-77y",
     })
-    expect(result.success).toBe(false)
-    expect(result.error?.issues).toHaveLength(2)
+    expect(r.success).toBe(false)
+    expect(r.error?.issues[0].path).toEqual(["confirmPassword"])
   })
 })

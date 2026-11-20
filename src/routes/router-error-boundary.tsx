@@ -3,6 +3,7 @@ import ForbiddenPage from "@/pages/errors/forbidden"
 import NotFoundPage from "@/pages/errors/not-found"
 import { reportError } from "@/lib/error-reporting"
 import { isRouteErrorResponse, useRouteError } from "react-router"
+import { GraphQLRequestError } from "@/services/api"
 
 function ChunkLoadError() {
   return (
@@ -51,7 +52,17 @@ const RouterErrorBoundary = () => {
 
   // Report genuine crashes only — 404/403 and stale-chunk reloads after a
   // deploy are expected traffic, not bugs.
-  const isExpected = isChunkLoadError || isRouteErrorResponse(error)
+  // Loaders surface API refusals as GraphQL errors (a loader runs even when
+  // the PermissionRoute element would redirect): map them to error pages.
+  const gqlCode =
+    error instanceof GraphQLRequestError
+      ? error.errors[0]?.extensions?.code
+      : undefined
+  const isExpected =
+    isChunkLoadError ||
+    isRouteErrorResponse(error) ||
+    gqlCode === "FORBIDDEN" ||
+    gqlCode === "NOT_FOUND"
   useEffect(() => {
     if (!isExpected) reportError(error)
   }, [error, isExpected])
@@ -60,6 +71,9 @@ const RouterErrorBoundary = () => {
   if (isChunkLoadError) {
     return <ChunkLoadError />
   }
+
+  if (gqlCode === "FORBIDDEN") return <ForbiddenPage />
+  if (gqlCode === "NOT_FOUND") return <NotFoundPage />
 
   if (isRouteErrorResponse(error)) {
     if (error.status === 404) return <NotFoundPage />
