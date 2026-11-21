@@ -90,7 +90,7 @@ export function LoginForm({
                   name="email"
                   label={t("auth.email")}
                   type="email"
-                  placeholder="name@azamtv.co.tz"
+                  placeholder="username@azamtv.co.tz"
                   autoComplete="email"
                 />
                 <TextField
@@ -119,7 +119,7 @@ export function LoginForm({
                 <FieldDescription className="text-center">
                   {t(
                     "auth.no_account_help",
-                    "Accounts are created by ICT from your employee record. Check your company email for the activation link."
+                    "Ask ICT Officer for a new Account"
                   )}
                 </FieldDescription>
               </FieldGroup>

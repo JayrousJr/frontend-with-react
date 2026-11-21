@@ -47,6 +47,16 @@ function subjectLink(r: ApprovalRequest): string | null {
       return withId(ROUTES.COUNT_DETAILS, r.subjectId)
     case "Disposal":
       return withId(ROUTES.DISPOSAL_DETAILS, r.subjectId)
+    case "InternalRequest":
+      return withId(ROUTES.INTERNAL_REQUEST_DETAILS, r.subjectId)
+    case "PurchaseRequest":
+      return withId(ROUTES.PURCHASE_REQUEST_DETAILS, r.subjectId)
+    case "Handover":
+      return withId(ROUTES.HANDOVER_DETAILS, r.subjectId)
+    case "AssetReport":
+      return `${ROUTES.CUSTODY}?tab=reports`
+    case "CustodyTransfer":
+      return `${ROUTES.CUSTODY}?tab=transfers`
     default:
       return null
   }

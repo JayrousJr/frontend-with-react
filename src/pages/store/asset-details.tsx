@@ -36,6 +36,7 @@ import {
 import { MovementsTable } from "./stock"
 import { TagLabel } from "./tag-label"
 import { AssetActions, AssetMaintenance } from "./asset-actions"
+import { AssetCustody } from "../custody/custody-history"
 
 function EditDialog({
   asset,
@@ -526,6 +527,11 @@ const AssetDetailsPage = () => {
         </Card>
       )}
 
+      <AssetCustody
+        assetUniqueId={a.uniqueId}
+        tag={a.tag}
+        onChanged={revalidate}
+      />
       <AssetMaintenance assetUniqueId={a.uniqueId} />
 
       <Card>

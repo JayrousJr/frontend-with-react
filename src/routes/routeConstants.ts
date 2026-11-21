@@ -66,6 +66,26 @@ export const ROUTES = {
   DISPOSALS: "/store/disposals",
   DISPOSAL_DETAILS: "/store/disposals/:uniqueId",
 
+  // B1 §6 — Requests
+  INTERNAL_REQUESTS: "/requests/internal",
+  INTERNAL_REQUEST_NEW: "/requests/internal/new",
+  INTERNAL_REQUEST_DETAILS: "/requests/internal/:uniqueId",
+  PURCHASE_REQUESTS: "/requests/purchase",
+  PURCHASE_REQUEST_NEW: "/requests/purchase/new",
+  PURCHASE_REQUEST_DETAILS: "/requests/purchase/:uniqueId",
+
+  // B3 — Handover & custody
+  MY_ITEMS: "/my-items",
+  CUSTODY: "/custody",
+  HANDOVERS: "/custody/handovers",
+  HANDOVER_NEW: "/custody/handovers/new",
+  HANDOVER_DETAILS: "/custody/handovers/:uniqueId",
+  RETURNS: "/custody/returns",
+  CUSTODY_REPORTS: "/custody/reports",
+  CUSTODY_TRANSFERS: "/custody/transfers",
+  INSPECTIONS: "/custody/inspections",
+  HANDOVER_ACK: "/handover-ack/:uniqueId",
+
   // Error
   NOT_FOUND: "/404",
   FORBIDDEN: "/403",

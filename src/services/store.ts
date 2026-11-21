@@ -784,6 +784,7 @@ export async function createStockDocument(input: {
   productionRef?: string | null
   reference?: string | null
   note?: string | null
+  internalRequestUniqueId?: string | null
   lines: {
     productUniqueId: string
     locationUniqueId: string

@@ -1,5 +1,7 @@
 import type { LucideIcon } from "lucide-react"
 import {
+  ClipboardListIcon,
+  HandHelpingIcon,
   Building2Icon,
   PackageSearchIcon,
   WarehouseIcon,
@@ -60,6 +62,12 @@ export const navMain: NavMainItem[] = [
         url: ROUTES.SETTINGS,
       },
       {
+        id: "my-items",
+        title: () => t("nav.my_items", "My items"),
+        url: ROUTES.MY_ITEMS,
+        requiredPermissions: [P.CUSTODY_VIEW],
+      },
+      {
         id: "approvals",
         title: () => t("nav.approvals", "My approvals"),
         url: ROUTES.APPROVALS,
@@ -78,6 +86,8 @@ export const navMain: NavMainItem[] = [
           P.EMPLOYEE_IMPORT,
           P.ASSET_VIEW,
           P.STOCK_VIEW,
+          P.CUSTODY_VIEW,
+          P.HANDOVER_VIEW,
         ],
       },
       {
@@ -127,6 +137,47 @@ export const navMain: NavMainItem[] = [
         title: () => t("nav.exit_clearances", "Exit clearances"),
         url: ROUTES.EXIT_CLEARANCES,
         anyPermissions: [P.EMPLOYEE_EXIT, P.EXIT_CLEARANCE_APPROVE],
+      },
+    ],
+  },
+  {
+    id: "requests",
+    title: () => t("nav.requests", "Requests"),
+    url: "#",
+    icon: ClipboardListIcon,
+    isActive: true,
+    items: [
+      {
+        id: "internal-requests",
+        title: () => t("nav.internal_requests", "Internal requests"),
+        url: ROUTES.INTERNAL_REQUESTS,
+        anyPermissions: [P.INTERNAL_REQUEST_VIEW, P.INTERNAL_REQUEST_CREATE],
+      },
+      {
+        id: "purchase-requests",
+        title: () => t("nav.purchase_requests", "Purchase requests"),
+        url: ROUTES.PURCHASE_REQUESTS,
+        anyPermissions: [P.PURCHASE_REQUEST_VIEW, P.PURCHASE_REQUEST_CREATE],
+      },
+    ],
+  },
+  {
+    id: "custody",
+    title: () => t("nav.custody_section", "Handover & custody"),
+    url: "#",
+    icon: HandHelpingIcon,
+    isActive: true,
+    items: [
+      {
+        id: "custody-overview",
+        title: () => t("nav.custody", "Custody"),
+        url: ROUTES.CUSTODY,
+        anyPermissions: [
+          P.HANDOVER_PREPARE,
+          P.RETURN_RECEIVE,
+          P.CUSTODY_TRANSFER_REQUEST,
+          P.ASSET_INSPECTION,
+        ],
       },
     ],
   },

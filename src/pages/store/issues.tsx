@@ -38,6 +38,7 @@ import { P, hasPermission } from "@/lib/permissions"
 import { ROUTES, withId } from "@/routes/routeConstants"
 import { fetchDepartments, type Department } from "@/services/org"
 import { fetchProducts } from "@/services/products"
+import { fetchInternalRequest, type InternalRequest } from "@/services/requests"
 import {
   createStockDocument,
   type BeneficiaryType,
@@ -175,12 +176,34 @@ export function IssueFormPage() {
   >({})
   const { user } = useAuth()
   const canListDepartments = hasPermission(user, P.DEPARTMENT_VIEW)
+  // Delivering an internal request: beneficiary and product come from it.
+  const requestId = type === "ISSUE" ? params.get("request") : null
+  const [ir, setIr] = useState<InternalRequest | null>(null)
+  useEffect(() => {
+    if (!requestId) return
+    void fetchInternalRequest(requestId).then((r) => {
+      setIr(r)
+      if (r.store) setStore(r.store.uniqueId)
+      setReference(r.number)
+      setLines([
+        {
+          ...newQtyLine(),
+          product: {
+            value: r.product.uniqueId,
+            label: r.product.name,
+            hint: r.product.code ?? "",
+          },
+          quantity: String(r.fromStoreQty - r.deliveredQty),
+        },
+      ])
+    })
+  }, [requestId])
   useEffect(() => {
     if (canListDepartments) void fetchDepartments().then(setDepartments)
   }, [canListDepartments])
 
   const who =
-    kind === "EMPLOYEE"
+    !!ir || kind === "EMPLOYEE"
       ? !!employee
       : kind === "DEPARTMENT"
         ? !!department
@@ -216,6 +239,22 @@ export function IssueFormPage() {
           </Button>
         }
       />
+      {ir && (
+        <Card className="border-sky-500/40">
+          <CardContent className="text-sm">
+            {t(
+              "issues.delivering",
+              "Delivering internal request {{n}} — {{q}} × {{p}} for {{who}}. The beneficiary is taken from the request.",
+              {
+                n: ir.number,
+                q: ir.fromStoreQty - ir.deliveredQty,
+                p: ir.product.name,
+                who: ir.beneficiary?.fullName ?? ir.requestingDepartment.name,
+              }
+            )}
+          </CardContent>
+        </Card>
+      )}
       <Card>
         <CardContent>
           <FieldGroup>
@@ -458,6 +497,7 @@ export function IssueFormPage() {
                     kind === "PRODUCTION" ? production.trim() : null,
                   reference: reference.trim() || null,
                   note: note.trim() || null,
+                  internalRequestUniqueId: ir?.uniqueId ?? null,
                   lines: lines.map((l) => {
                     if (type === "ISSUE") {
                       const { locationUniqueId, batchNumber } = splitSource(

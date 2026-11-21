@@ -47,6 +47,14 @@ import {
   fetchStores,
   type AssetStatus,
 } from "@/services/store"
+import {
+  fetchInternalRequest,
+  fetchInternalRequests,
+  fetchPurchaseRequest,
+  fetchPurchaseRequests,
+  type IrView,
+} from "@/services/requests"
+import { fetchHandover } from "@/services/custody"
 import { AUTH_ROUTES, ROUTES } from "./routeConstants"
 import ProtectedRoute from "./protected-route"
 import PublicOnlyRoute from "./public-only-route"
@@ -66,6 +74,13 @@ const pageInput = (params: URLSearchParams) => ({
 })
 
 export const routes = createBrowserRouter([
+  /** Handover acknowledgement by email link — no login (B3 §4.3). */
+  {
+    path: ROUTES.HANDOVER_ACK,
+    errorElement: <RouterErrorBoundary />,
+    lazy: () => lazyPage(() => import("@/pages/public/handover-ack")),
+  },
+
   /** Root: straight to the dashboard (or login, via ProtectedRoute). */
   { index: true, element: <Navigate to={ROUTES.DASHBOARD} replace /> },
 
@@ -269,6 +284,144 @@ export const routes = createBrowserRouter([
             }),
             lazy: () =>
               lazyPage(() => import("@/pages/employees/employee-details")),
+          },
+
+          // ── B1 §6 Requests ─────────────────────────────────────────────
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[
+                  P.INTERNAL_REQUEST_VIEW,
+                  P.INTERNAL_REQUEST_CREATE,
+                ]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.INTERNAL_REQUESTS,
+                loader: async ({ request }) => {
+                  const v = (page(request.url).get("view") ?? "mine") as IrView
+                  return { requests: await fetchInternalRequests(v), view: v }
+                },
+                lazy: () =>
+                  lazyPage(() => import("@/pages/requests/internal-requests")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute
+                requiredPermissions={[P.INTERNAL_REQUEST_CREATE]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.INTERNAL_REQUEST_NEW,
+                lazy: () =>
+                  lazyPage(
+                    () => import("@/pages/requests/internal-request-form")
+                  ),
+              },
+            ],
+          },
+          {
+            path: ROUTES.INTERNAL_REQUEST_DETAILS,
+            loader: async ({ params }) => ({
+              request: await fetchInternalRequest(params.uniqueId!),
+            }),
+            lazy: () =>
+              lazyPage(
+                () => import("@/pages/requests/internal-request-details")
+              ),
+          },
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[
+                  P.PURCHASE_REQUEST_VIEW,
+                  P.PURCHASE_REQUEST_CREATE,
+                ]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.PURCHASE_REQUESTS,
+                loader: async () => ({
+                  requests: await fetchPurchaseRequests(),
+                }),
+                lazy: () =>
+                  lazyPage(() => import("@/pages/requests/purchase-requests")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute
+                requiredPermissions={[P.PURCHASE_REQUEST_CREATE]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.PURCHASE_REQUEST_NEW,
+                lazy: () =>
+                  lazyPage(
+                    () => import("@/pages/requests/purchase-request-form")
+                  ),
+              },
+            ],
+          },
+          {
+            path: ROUTES.PURCHASE_REQUEST_DETAILS,
+            loader: async ({ params }) => ({
+              request: await fetchPurchaseRequest(params.uniqueId!),
+            }),
+            lazy: () =>
+              lazyPage(
+                () => import("@/pages/requests/purchase-request-details")
+              ),
+          },
+
+          // ── B3 Handover & custody ──────────────────────────────────────
+          {
+            path: ROUTES.MY_ITEMS,
+            lazy: () => lazyPage(() => import("@/pages/custody/my-items")),
+          },
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[
+                  P.CUSTODY_VIEW,
+                  P.HANDOVER_PREPARE,
+                  P.RETURN_RECEIVE,
+                ]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.CUSTODY,
+                lazy: () => lazyPage(() => import("@/pages/custody/custody")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute requiredPermissions={[P.HANDOVER_PREPARE]} />
+            ),
+            children: [
+              {
+                path: ROUTES.HANDOVER_NEW,
+                lazy: () =>
+                  lazyPage(() => import("@/pages/custody/handover-form")),
+              },
+            ],
+          },
+          {
+            path: ROUTES.HANDOVER_DETAILS,
+            loader: async ({ params }) => ({
+              handover: await fetchHandover(params.uniqueId!),
+            }),
+            lazy: () =>
+              lazyPage(() => import("@/pages/custody/handover-details")),
           },
 
           // ── B1 Product Repository ──────────────────────────────────────
