@@ -374,7 +374,22 @@
     "delegation_pending_message": "Ukaimishaji unasubiri idhini yako.",
     "delegation_approved_title": "Ukaimishaji umeidhinishwa",
     "delegation_rejected_title": "Ukaimishaji umekataliwa",
-    "delegation_decided_message": "Fungua Ukaimishaji kuona maelezo."
+    "delegation_decided_message": "Fungua Ukaimishaji kuona maelezo.",
+    "reorder_title": "Kiwango cha kuagiza kimefikiwa",
+    "reorder_message": "{{product}} katika {{store}}: zinapatikana {{available}}. Pendekezo la kuagiza: {{suggested}}.",
+    "reorder_transfer_message": "{{product}} katika {{store}}: zinapatikana {{available}}. Pendekezo: hamisha {{suggested}} kutoka stoo kuu.",
+    "transfer_dispatched_title": "Uhamisho uko njiani",
+    "transfer_dispatched_message": "{{number}} kutoka {{from}} unakuja {{to}}. Thibitisha upokeaji ukifika.",
+    "transfer_overdue_title": "Upokeaji wa uhamisho umechelewa",
+    "transfer_overdue_message": "{{number}} ({{from}} → {{to}}) bado haujathibitishwa kupokelewa.",
+    "transfer_received_title": "Uhamisho umepokelewa",
+    "transfer_discrepancy_title": "Uhamisho umepokelewa pungufu",
+    "transfer_received_message": "{{number}} umepokelewa {{store}}.",
+    "transfer_cancelled_title": "Uhamisho umefutwa",
+    "transfer_cancelled_message": "{{number}} haukuweza kuhifadhiwa na umefutwa.",
+    "vehicle_doc_expiring_title": "Hati ya gari inakaribia kuisha",
+    "vehicle_doc_expired_title": "Hati ya gari imeisha",
+    "vehicle_doc_message": "{{registration}} ({{vehicle}}): {{document}} — siku {{days}}."
   },
   "validation": {
     "required": "Sehemu hii inahitajika",

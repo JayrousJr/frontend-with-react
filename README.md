@@ -23,6 +23,9 @@ Store (B2 basics): stock levels and movements, asset register with tag scan,
 asset page (kit, vehicle, history, QR tag), asset tags (issue + print),
 adjustments (found/donated/correction) and the opening-balance import, stores
 and locations with stock levels. Store roles are assigned per store on the user page.
+Also: transfers (with printable transfer note), issues & returns (vouchers), stock counts
+(scan + blind entry), maintenance tickets, disposals, and asset actions (report fault,
+propose disposal, mark lost / found).
 
 - Permissions only — `P` constants in `src/lib/permissions.ts` mirror the backend catalogue; there is **no admin bypass** and no role-name checks.
 - Domain services: `src/services/{org,employees,users,access,admin,auth,products,store}.ts` (GraphQL documents live next to their service).

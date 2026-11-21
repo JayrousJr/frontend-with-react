@@ -53,6 +53,18 @@ export const ROUTES = {
   ADJUSTMENT_NEW: "/store/adjustments/new",
   ADJUSTMENT_DETAILS: "/store/adjustments/:uniqueId",
   OPENING_BALANCE: "/store/opening-balance",
+  TRANSFERS: "/store/transfers",
+  TRANSFER_NEW: "/store/transfers/new",
+  TRANSFER_DETAILS: "/store/transfers/:uniqueId",
+  ISSUES: "/store/issues",
+  ISSUE_NEW: "/store/issues/new",
+  ISSUE_DETAILS: "/store/issues/:uniqueId",
+  COUNTS: "/store/counts",
+  COUNT_DETAILS: "/store/counts/:uniqueId",
+  MAINTENANCE: "/store/maintenance",
+  MAINTENANCE_DETAILS: "/store/maintenance/:uniqueId",
+  DISPOSALS: "/store/disposals",
+  DISPOSAL_DETAILS: "/store/disposals/:uniqueId",
 
   // Error
   NOT_FOUND: "/404",

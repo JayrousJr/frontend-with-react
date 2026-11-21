@@ -35,6 +35,7 @@ import {
 } from "@/services/store"
 import { MovementsTable } from "./stock"
 import { TagLabel } from "./tag-label"
+import { AssetActions, AssetMaintenance } from "./asset-actions"
 
 function EditDialog({
   asset,
@@ -353,6 +354,7 @@ const AssetDetailsPage = () => {
         }
         actions={
           <>
+            <AssetActions asset={a} onChanged={revalidate} />
             {hasPermission(user, P.ASSET_TAG_PRINT) && (
               <Button variant="outline" asChild>
                 <Link
@@ -523,6 +525,8 @@ const AssetDetailsPage = () => {
           </CardContent>
         </Card>
       )}
+
+      <AssetMaintenance assetUniqueId={a.uniqueId} />
 
       <Card>
         <CardHeader>

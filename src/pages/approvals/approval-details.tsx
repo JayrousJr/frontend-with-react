@@ -41,6 +41,12 @@ function subjectLink(r: ApprovalRequest): string | null {
       return withId(ROUTES.PRODUCT_DETAILS, r.subjectId)
     case "StockAdjustment":
       return withId(ROUTES.ADJUSTMENT_DETAILS, r.subjectId)
+    case "Transfer":
+      return withId(ROUTES.TRANSFER_DETAILS, r.subjectId)
+    case "StockCount":
+      return withId(ROUTES.COUNT_DETAILS, r.subjectId)
+    case "Disposal":
+      return withId(ROUTES.DISPOSAL_DETAILS, r.subjectId)
     default:
       return null
   }

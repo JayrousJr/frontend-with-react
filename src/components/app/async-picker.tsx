@@ -70,7 +70,7 @@ export function AsyncPicker({
   }, [open, query, search])
 
   return (
-    <div className="flex w-full items-center gap-1">
+    <div className="flex w-full min-w-0 items-center gap-1">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -151,6 +151,7 @@ export function AsyncPicker({
           type="button"
           variant="ghost"
           size="icon"
+          className="shrink-0"
           aria-label={t("picker.clear", "Clear")}
           onClick={() => onChange(null)}
         >

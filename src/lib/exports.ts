@@ -171,10 +171,55 @@ export const navMain: NavMainItem[] = [
         anyPermissions: [P.ASSET_VIEW, P.STOCK_VIEW],
       },
       {
+        id: "transfers",
+        title: () => t("nav.transfers", "Transfers"),
+        url: ROUTES.TRANSFERS,
+        anyPermissions: [
+          P.TRANSFER_CREATE,
+          P.TRANSFER_DISPATCH,
+          P.TRANSFER_RECEIVE,
+          P.STOCK_VIEW,
+          P.STORE_MANAGE,
+        ],
+      },
+      {
+        id: "issues",
+        title: () => t("nav.issues", "Issues & returns"),
+        url: ROUTES.ISSUES,
+        anyPermissions: [P.STOCK_ISSUE, P.STOCK_RETURN, P.STOCK_VIEW],
+      },
+      {
         id: "adjustments",
         title: () => t("nav.adjustments", "Adjustments"),
         url: ROUTES.ADJUSTMENTS,
         anyPermissions: [P.STOCK_ADJUST, P.STOCK_VIEW, P.STORE_MANAGE],
+      },
+      {
+        id: "counts",
+        title: () => t("nav.counts", "Stock counts"),
+        url: ROUTES.COUNTS,
+        anyPermissions: [
+          P.STOCK_COUNT_CREATE,
+          P.STOCK_COUNT_COUNT,
+          P.STOCK_COUNT_APPROVE,
+          P.STOCK_VIEW,
+        ],
+      },
+      {
+        id: "maintenance",
+        title: () => t("nav.maintenance", "Maintenance"),
+        url: ROUTES.MAINTENANCE,
+        anyPermissions: [P.MAINTENANCE_CREATE, P.MAINTENANCE_UPDATE],
+      },
+      {
+        id: "disposals",
+        title: () => t("nav.disposals", "Disposals"),
+        url: ROUTES.DISPOSALS,
+        anyPermissions: [
+          P.DISPOSAL_PROPOSE,
+          P.DISPOSAL_APPROVE,
+          P.STORE_MANAGE,
+        ],
       },
       {
         id: "tags",

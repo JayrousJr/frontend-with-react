@@ -374,7 +374,22 @@
     "delegation_pending_message": "A delegation is waiting for your approval.",
     "delegation_approved_title": "Delegation approved",
     "delegation_rejected_title": "Delegation rejected",
-    "delegation_decided_message": "Open Delegations to see the details."
+    "delegation_decided_message": "Open Delegations to see the details.",
+    "reorder_title": "Reorder level reached",
+    "reorder_message": "{{product}} in {{store}}: {{available}} available. Suggested order: {{suggested}}.",
+    "reorder_transfer_message": "{{product}} in {{store}}: {{available}} available. Suggested: transfer {{suggested}} from the main store.",
+    "transfer_dispatched_title": "Transfer on its way",
+    "transfer_dispatched_message": "{{number}} from {{from}} is coming to {{to}}. Confirm receipt when it arrives.",
+    "transfer_overdue_title": "Transfer receipt overdue",
+    "transfer_overdue_message": "{{number}} ({{from}} → {{to}}) has not been confirmed as received.",
+    "transfer_received_title": "Transfer received",
+    "transfer_discrepancy_title": "Transfer received short",
+    "transfer_received_message": "{{number}} was received at {{store}}.",
+    "transfer_cancelled_title": "Transfer cancelled",
+    "transfer_cancelled_message": "{{number}} could not be reserved and was cancelled.",
+    "vehicle_doc_expiring_title": "Vehicle document expiring",
+    "vehicle_doc_expired_title": "Vehicle document expired",
+    "vehicle_doc_message": "{{registration}} ({{vehicle}}): {{document}} — {{days}} days."
   },
   "validation": {
     "required": "This field is required",

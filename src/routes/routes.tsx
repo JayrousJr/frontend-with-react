@@ -32,7 +32,17 @@ import {
   fetchAdjustments,
   fetchAsset,
   fetchAssets,
+  fetchCount,
+  fetchCounts,
+  fetchDisposal,
+  fetchDisposals,
+  fetchTicket,
+  fetchTickets,
+  fetchStockDocument,
+  fetchStockDocuments,
   fetchStockLevels,
+  fetchTransfer,
+  fetchTransfers,
   fetchStore,
   fetchStores,
   type AssetStatus,
@@ -487,6 +497,171 @@ export const routes = createBrowserRouter([
                   lazyPage(() => import("@/pages/store/opening-balance")),
               },
             ],
+          },
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[
+                  P.TRANSFER_CREATE,
+                  P.TRANSFER_DISPATCH,
+                  P.TRANSFER_RECEIVE,
+                  P.STOCK_VIEW,
+                  P.STORE_MANAGE,
+                ]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.TRANSFERS,
+                loader: async () => ({ transfers: await fetchTransfers() }),
+                lazy: () => lazyPage(() => import("@/pages/store/transfers")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute requiredPermissions={[P.TRANSFER_CREATE]} />
+            ),
+            children: [
+              {
+                path: ROUTES.TRANSFER_NEW,
+                loader: async () => ({ stores: await fetchStores() }),
+                lazy: () =>
+                  lazyPage(() => import("@/pages/store/transfer-form")),
+              },
+            ],
+          },
+          {
+            path: ROUTES.TRANSFER_DETAILS,
+            loader: async ({ params }) => ({
+              transfer: await fetchTransfer(params.uniqueId!),
+            }),
+            lazy: () =>
+              lazyPage(() => import("@/pages/store/transfer-details")),
+          },
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[P.STOCK_ISSUE, P.STOCK_RETURN, P.STOCK_VIEW]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.ISSUES,
+                loader: async () => ({
+                  documents: await fetchStockDocuments(),
+                }),
+                lazy: () => lazyPage(() => import("@/pages/store/issues")),
+              },
+              {
+                path: ROUTES.ISSUE_DETAILS,
+                loader: async ({ params }) => ({
+                  document: await fetchStockDocument(params.uniqueId!),
+                }),
+                lazy: () =>
+                  lazyPage(() => import("@/pages/store/issue-details")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[P.STOCK_ISSUE, P.STOCK_RETURN]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.ISSUE_NEW,
+                loader: async () => ({ stores: await fetchStores() }),
+                lazy: () => lazyPage(() => import("@/pages/store/issue-form")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[
+                  P.STOCK_COUNT_CREATE,
+                  P.STOCK_COUNT_COUNT,
+                  P.STOCK_COUNT_APPROVE,
+                  P.STOCK_VIEW,
+                ]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.COUNTS,
+                loader: async () => {
+                  const [counts, stores] = await Promise.all([
+                    fetchCounts(),
+                    fetchStores(),
+                  ])
+                  return { counts, stores }
+                },
+                lazy: () => lazyPage(() => import("@/pages/store/counts")),
+              },
+            ],
+          },
+          {
+            path: ROUTES.COUNT_DETAILS,
+            loader: async ({ params }) => ({
+              count: await fetchCount(params.uniqueId!),
+            }),
+            lazy: () => lazyPage(() => import("@/pages/store/count-details")),
+          },
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[
+                  P.MAINTENANCE_CREATE,
+                  P.MAINTENANCE_UPDATE,
+                  P.ASSET_VIEW,
+                  P.STOCK_VIEW,
+                ]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.MAINTENANCE,
+                loader: async () => ({ tickets: await fetchTickets() }),
+                lazy: () => lazyPage(() => import("@/pages/store/maintenance")),
+              },
+            ],
+          },
+          {
+            path: ROUTES.MAINTENANCE_DETAILS,
+            loader: async ({ params }) => ({
+              ticket: await fetchTicket(params.uniqueId!),
+            }),
+            lazy: () =>
+              lazyPage(() => import("@/pages/store/maintenance-details")),
+          },
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[
+                  P.DISPOSAL_PROPOSE,
+                  P.DISPOSAL_APPROVE,
+                  P.ASSET_VIEW,
+                  P.STOCK_VIEW,
+                ]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.DISPOSALS,
+                loader: async () => ({ disposals: await fetchDisposals() }),
+                lazy: () => lazyPage(() => import("@/pages/store/disposals")),
+              },
+            ],
+          },
+          {
+            path: ROUTES.DISPOSAL_DETAILS,
+            loader: async ({ params }) => ({
+              disposal: await fetchDisposal(params.uniqueId!),
+            }),
+            lazy: () =>
+              lazyPage(() => import("@/pages/store/disposal-details")),
           },
           {
             // Creator, store staff and approvers; checked by the API.

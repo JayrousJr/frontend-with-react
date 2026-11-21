@@ -2,8 +2,12 @@ import { useEffect, useState } from "react"
 import { Link } from "react-router"
 import { useTranslation } from "react-i18next"
 import {
+  BoxesIcon,
   Building2Icon,
   ChevronRightIcon,
+  PackageIcon,
+  PackageSearchIcon,
+  TruckIcon,
   InboxIcon,
   KeyRoundIcon,
   ScrollTextIcon,
@@ -65,6 +69,43 @@ const DashboardPage = () => {
       to: ROUTES.DEPARTMENTS,
       icon: Building2Icon,
       permission: P.DEPARTMENT_VIEW,
+    },
+    {
+      title: t("nav.products", "Product Repository"),
+      description: t(
+        "dashboard.products_hint",
+        "Search, create and activate products"
+      ),
+      to: ROUTES.PRODUCTS,
+      icon: PackageSearchIcon,
+      permission: P.ITEM_VIEW,
+    },
+    {
+      title: t("nav.stock", "Stock"),
+      description: t(
+        "dashboard.stock_hint",
+        "Levels per store, movements, reorder alerts"
+      ),
+      to: ROUTES.STOCK,
+      icon: PackageIcon,
+      permission: P.STOCK_VIEW,
+    },
+    {
+      title: t("nav.assets", "Assets"),
+      description: t(
+        "dashboard.assets_hint",
+        "Asset register, tags, kits and vehicles"
+      ),
+      to: ROUTES.ASSETS,
+      icon: BoxesIcon,
+      permission: P.ASSET_VIEW,
+    },
+    {
+      title: t("nav.transfers", "Transfers"),
+      description: t("dashboard.transfers_hint", "Move stock between stores"),
+      to: ROUTES.TRANSFERS,
+      icon: TruckIcon,
+      permission: P.TRANSFER_CREATE,
     },
     {
       title: t("nav.users", "Users"),
