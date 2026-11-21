@@ -36,7 +36,8 @@ import { scopeHint, scopeLabel } from "./scope-label"
 const MODULE_NAMES: Record<string, string> = {
   A1: "A1 · Users & employees",
   SHARED: "Shared services",
-  B1: "B1 · Tender & procurement",
+  B1: "B1 · Products & requests",
+  B1T: "B1 · Tender, LPO & receiving",
   B2: "B2 · Store & inventory",
   B3: "B3 · Handover & custody",
 }
