@@ -269,6 +269,7 @@ export type Tender = {
     viewBids: boolean
   }
   isMember: boolean
+  myCoiDeclared: boolean
 }
 
 export type TenderInput = {

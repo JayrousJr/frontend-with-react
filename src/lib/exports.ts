@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react"
 import {
+  GavelIcon,
   ClipboardListIcon,
   HandHelpingIcon,
   Building2Icon,
@@ -8,6 +9,7 @@ import {
   LayoutDashboardIcon,
   ShieldCheckIcon,
   UsersIcon,
+  ClapperboardIcon,
 } from "lucide-react"
 import { ROUTES } from "@/routes/routeConstants"
 import { P } from "@/lib/permissions"
@@ -158,6 +160,146 @@ export const navMain: NavMainItem[] = [
         title: () => t("nav.purchase_requests", "Purchase requests"),
         url: ROUTES.PURCHASE_REQUESTS,
         anyPermissions: [P.PURCHASE_REQUEST_VIEW, P.PURCHASE_REQUEST_CREATE],
+      },
+    ],
+  },
+  {
+    id: "production",
+    title: () => t("nav.production", "Production"),
+    url: "#",
+    icon: ClapperboardIcon,
+    isActive: true,
+    items: [
+      {
+        id: "my-productions",
+        title: () => t("nav.my_productions", "My productions"),
+        url: ROUTES.MY_PRODUCTIONS,
+      },
+      {
+        id: "productions",
+        title: () => t("nav.productions", "Productions"),
+        url: ROUTES.PRODUCTIONS,
+        anyPermissions: [P.PRODUCTION_VIEW, P.PRODUCTION_CREATE],
+      },
+      {
+        id: "production-calendar",
+        title: () => t("nav.production_calendar", "Calendar"),
+        url: ROUTES.PRODUCTION_CALENDAR,
+        anyPermissions: [P.PRODUCTION_CALENDAR, P.PRODUCTION_VIEW],
+      },
+      {
+        id: "production-monitor",
+        title: () => t("nav.production_monitor", "Monitoring"),
+        url: ROUTES.PRODUCTION_MONITOR,
+        anyPermissions: [P.PRODUCTION_CALENDAR],
+      },
+      {
+        id: "crew-overview",
+        title: () => t("nav.crew_overview", "Crew overview"),
+        url: ROUTES.CREW_OVERVIEW,
+        anyPermissions: [P.CREW_ASSIGN, P.CREW_APPROVE_ADDITIONAL],
+      },
+      {
+        id: "staff-unavailability",
+        title: () => t("nav.staff_unavailability", "Staff unavailability"),
+        url: ROUTES.STAFF_UNAVAILABILITY,
+        anyPermissions: [P.UNAVAILABILITY_MANAGE],
+      },
+      {
+        id: "equipment-bookings",
+        title: () => t("nav.equipment_bookings", "Equipment bookings"),
+        url: ROUTES.EQUIPMENT_BOOKINGS,
+        anyPermissions: [P.BOOKING_VIEW, P.BOOKING_CONFIRM, P.BOOKING_CREATE],
+      },
+      {
+        id: "transport",
+        title: () => t("nav.transport", "Transport"),
+        url: ROUTES.TRANSPORT,
+        anyPermissions: [
+          P.TRANSPORT_VIEW,
+          P.TRANSPORT_ALLOCATE,
+          P.TRANSPORT_REQUEST,
+        ],
+      },
+      {
+        id: "production-documents",
+        title: () => t("nav.production_documents", "Production documents"),
+        url: ROUTES.PRODUCTION_DOCUMENTS,
+        anyPermissions: [P.PRODUCTION_VIEW],
+      },
+      {
+        id: "attendance",
+        title: () => t("nav.attendance", "Attendance & hours"),
+        url: ROUTES.ATTENDANCE,
+        anyPermissions: [P.ATTENDANCE_VIEW],
+      },
+      {
+        id: "announcements",
+        title: () => t("nav.announcements", "Announcements"),
+        url: ROUTES.ANNOUNCEMENTS,
+      },
+      {
+        id: "management-dashboard",
+        title: () => t("nav.management_dashboard", "Management dashboard"),
+        url: ROUTES.MANAGEMENT_DASHBOARD,
+        anyPermissions: [P.DASHBOARD_VIEW],
+      },
+      {
+        id: "production-settings",
+        title: () => t("nav.production_settings", "Production settings"),
+        url: ROUTES.PRODUCTION_SETTINGS,
+        anyPermissions: [P.PRODUCTION_CONFIG],
+      },
+    ],
+  },
+  {
+    id: "procurement",
+    title: () => t("nav.procurement", "Tender & procurement"),
+    url: "#",
+    icon: GavelIcon,
+    isActive: true,
+    items: [
+      {
+        id: "purchasing",
+        title: () => t("nav.purchasing", "Purchasing"),
+        url: ROUTES.PURCHASING,
+        requiredPermissions: [P.ASSIGN_ROUTE],
+      },
+      {
+        id: "tenders",
+        title: () => t("nav.tenders", "Tenders"),
+        url: ROUTES.TENDERS,
+        requiredPermissions: [P.TENDER_VIEW],
+      },
+      {
+        id: "orders",
+        title: () => t("nav.orders", "LPOs"),
+        url: ROUTES.ORDERS,
+        anyPermissions: [P.LPO_VIEW],
+      },
+      {
+        id: "grns",
+        title: () => t("nav.grns", "Goods received"),
+        url: ROUTES.GRNS,
+        anyPermissions: [P.GRN_VIEW, P.STOCK_RECEIVE],
+      },
+      {
+        id: "goods-inspections",
+        title: () => t("nav.goods_inspections", "Receiving inspections"),
+        url: ROUTES.GOODS_INSPECTIONS,
+        anyPermissions: [P.INSPECTION_VIEW, P.INSPECTION_PERFORM],
+      },
+      {
+        id: "invoices",
+        title: () => t("nav.invoices", "Invoices & payments"),
+        url: ROUTES.INVOICES,
+        requiredPermissions: [P.INVOICE_VIEW],
+      },
+      {
+        id: "vendors",
+        title: () => t("nav.vendors", "Vendors"),
+        url: ROUTES.VENDORS,
+        requiredPermissions: [P.VENDOR_VIEW],
       },
     ],
   },

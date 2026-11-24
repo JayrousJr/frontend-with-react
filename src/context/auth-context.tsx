@@ -73,6 +73,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     async function validateSession() {
+      // The vendor portal has its own session; never touch the staff one there.
+      if (window.location.pathname.startsWith("/portal")) {
+        setIsLoading(false)
+        return
+      }
       try {
         // The refresh token is an HttpOnly cookie. Shares one in-flight
         // request with any route loader doing the same on a deep link —

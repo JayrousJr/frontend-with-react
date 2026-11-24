@@ -90,7 +90,7 @@ export function LoginForm({
                   name="email"
                   label={t("auth.email")}
                   type="email"
-                  placeholder="username@azamtv.co.tz"
+                  placeholder="username@azam-media.com"
                   autoComplete="email"
                 />
                 <TextField

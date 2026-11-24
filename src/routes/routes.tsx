@@ -81,6 +81,49 @@ export const routes = createBrowserRouter([
     lazy: () => lazyPage(() => import("@/pages/public/handover-ack")),
   },
 
+  /** Vendor portal (B1 §8): its own sign-in and session, no staff menus. */
+  {
+    path: "/portal/login",
+    errorElement: <RouterErrorBoundary />,
+    lazy: () => lazyPage(() => import("@/pages/portal/login")),
+  },
+  {
+    path: "/portal/activate/:uniqueId",
+    errorElement: <RouterErrorBoundary />,
+    lazy: () => lazyPage(() => import("@/pages/portal/activate")),
+  },
+  {
+    path: ROUTES.PORTAL,
+    errorElement: <RouterErrorBoundary />,
+    lazy: () => lazyPage(() => import("@/pages/portal/layout")),
+    children: [
+      {
+        index: true,
+        lazy: () => lazyPage(() => import("@/pages/portal/tenders")),
+      },
+      {
+        path: "tenders/:uniqueId",
+        lazy: () => lazyPage(() => import("@/pages/portal/tender")),
+      },
+      {
+        path: "orders",
+        lazy: () => lazyPage(() => import("@/pages/portal/orders-page")),
+      },
+      {
+        path: "orders/:uniqueId",
+        lazy: () => lazyPage(() => import("@/pages/portal/order")),
+      },
+      {
+        path: "notifications",
+        lazy: () => lazyPage(() => import("@/pages/portal/notifications")),
+      },
+      {
+        path: "users",
+        lazy: () => lazyPage(() => import("@/pages/portal/users")),
+      },
+    ],
+  },
+
   /** Root: straight to the dashboard (or login, via ProtectedRoute). */
   { index: true, element: <Navigate to={ROUTES.DASHBOARD} replace /> },
 
@@ -379,6 +422,255 @@ export const routes = createBrowserRouter([
               lazyPage(
                 () => import("@/pages/requests/purchase-request-details")
               ),
+          },
+
+          // ── Production 01–15 (each page's data is scope-checked by the API) ──
+          {
+            path: ROUTES.PRODUCTIONS,
+            lazy: () =>
+              lazyPage(() => import("@/pages/production/productions")),
+          },
+          {
+            path: ROUTES.PRODUCTION_NEW,
+            lazy: () =>
+              lazyPage(() => import("@/pages/production/production-form")),
+          },
+          {
+            path: ROUTES.PRODUCTION_EDIT,
+            lazy: () =>
+              lazyPage(() => import("@/pages/production/production-form")),
+          },
+          {
+            path: ROUTES.CALL_SHEET,
+            lazy: () => lazyPage(() => import("@/pages/production/call-sheet")),
+          },
+          {
+            path: ROUTES.BADGES,
+            lazy: () => lazyPage(() => import("@/pages/production/badges")),
+          },
+          {
+            path: ROUTES.PRODUCTION_DETAILS,
+            lazy: () =>
+              lazyPage(() => import("@/pages/production/production-details")),
+          },
+          {
+            path: ROUTES.PRODUCTION_CALENDAR,
+            lazy: () => lazyPage(() => import("@/pages/production/calendar")),
+          },
+          {
+            path: ROUTES.MY_PRODUCTIONS,
+            lazy: () =>
+              lazyPage(() => import("@/pages/production/my-productions")),
+          },
+          {
+            path: ROUTES.EQUIPMENT_BOOKINGS,
+            lazy: () => lazyPage(() => import("@/pages/production/bookings")),
+          },
+          {
+            path: ROUTES.EQUIPMENT_BOOKING_DETAILS,
+            lazy: () =>
+              lazyPage(() => import("@/pages/production/booking-details")),
+          },
+          {
+            path: ROUTES.TRANSPORT,
+            lazy: () => lazyPage(() => import("@/pages/production/transport")),
+          },
+          {
+            path: ROUTES.TRANSPORT_DETAILS,
+            lazy: () =>
+              lazyPage(() => import("@/pages/production/trip-details")),
+          },
+          {
+            path: ROUTES.PRODUCTION_DOCUMENTS,
+            lazy: () => lazyPage(() => import("@/pages/production/documents")),
+          },
+          {
+            path: ROUTES.ANNOUNCEMENTS,
+            lazy: () =>
+              lazyPage(() => import("@/pages/production/announcements")),
+          },
+          {
+            path: ROUTES.PRODUCTION_MONITOR,
+            lazy: () => lazyPage(() => import("@/pages/production/monitor")),
+          },
+          {
+            path: ROUTES.MANAGEMENT_DASHBOARD,
+            lazy: () => lazyPage(() => import("@/pages/production/dashboard")),
+          },
+          {
+            path: ROUTES.STAFF_UNAVAILABILITY,
+            lazy: () =>
+              lazyPage(() => import("@/pages/production/unavailability")),
+          },
+          {
+            path: ROUTES.CREW_OVERVIEW,
+            lazy: () =>
+              lazyPage(() => import("@/pages/production/crew-overview")),
+          },
+          {
+            path: ROUTES.PRODUCTION_SETTINGS,
+            lazy: () => lazyPage(() => import("@/pages/production/settings")),
+          },
+          {
+            path: ROUTES.ATTENDANCE,
+            lazy: () => lazyPage(() => import("@/pages/production/attendance")),
+          },
+
+          // ── B1 §7–§11 Tender, LPO, receiving, finance ─────────────────
+          {
+            element: <PermissionRoute anyPermissions={[P.VENDOR_VIEW]} />,
+            children: [
+              {
+                path: ROUTES.VENDORS,
+                lazy: () =>
+                  lazyPage(() => import("@/pages/procurement/vendors")),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute anyPermissions={[P.VENDOR_VIEW]} />,
+            children: [
+              {
+                path: ROUTES.VENDOR_DETAILS,
+                lazy: () =>
+                  lazyPage(() => import("@/pages/procurement/vendor-details")),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute anyPermissions={[P.ASSIGN_ROUTE]} />,
+            children: [
+              {
+                path: ROUTES.PURCHASING,
+                lazy: () => lazyPage(() => import("@/pages/procurement/queue")),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute anyPermissions={[P.TENDER_VIEW]} />,
+            children: [
+              {
+                path: ROUTES.TENDERS,
+                lazy: () =>
+                  lazyPage(() => import("@/pages/procurement/tenders")),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute anyPermissions={[P.TENDER_VIEW]} />,
+            children: [
+              {
+                path: ROUTES.TENDER_DETAILS,
+                lazy: () =>
+                  lazyPage(() => import("@/pages/procurement/tender-details")),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute anyPermissions={[P.LPO_VIEW]} />,
+            children: [
+              {
+                path: ROUTES.ORDERS,
+                lazy: () =>
+                  lazyPage(() => import("@/pages/procurement/orders")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute anyPermissions={[P.LPO_VIEW, P.STOCK_RECEIVE]} />
+            ),
+            children: [
+              {
+                path: ROUTES.ORDER_DETAILS,
+                lazy: () =>
+                  lazyPage(() => import("@/pages/procurement/order-details")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute anyPermissions={[P.GRN_VIEW, P.STOCK_RECEIVE]} />
+            ),
+            children: [
+              {
+                path: ROUTES.GRNS,
+                lazy: () =>
+                  lazyPage(() => import("@/pages/procurement/grns-page")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute anyPermissions={[P.GRN_VIEW, P.STOCK_RECEIVE]} />
+            ),
+            children: [
+              {
+                path: ROUTES.GRN_DETAILS,
+                lazy: () =>
+                  lazyPage(() => import("@/pages/procurement/grn-details")),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[
+                  P.INSPECTION_VIEW,
+                  P.INSPECTION_PERFORM,
+                  P.STOCK_RECEIVE,
+                ]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.GOODS_INSPECTIONS,
+                lazy: () =>
+                  lazyPage(
+                    () => import("@/pages/procurement/inspections-page")
+                  ),
+              },
+            ],
+          },
+          {
+            element: (
+              <PermissionRoute
+                anyPermissions={[
+                  P.INSPECTION_VIEW,
+                  P.INSPECTION_PERFORM,
+                  P.STOCK_RECEIVE,
+                ]}
+              />
+            ),
+            children: [
+              {
+                path: ROUTES.GOODS_INSPECTION_DETAILS,
+                lazy: () =>
+                  lazyPage(
+                    () => import("@/pages/procurement/inspection-details")
+                  ),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute anyPermissions={[P.INVOICE_VIEW]} />,
+            children: [
+              {
+                path: ROUTES.INVOICES,
+                lazy: () =>
+                  lazyPage(() => import("@/pages/procurement/invoices-page")),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute anyPermissions={[P.INVOICE_VIEW]} />,
+            children: [
+              {
+                path: ROUTES.INVOICE_DETAILS,
+                lazy: () =>
+                  lazyPage(() => import("@/pages/procurement/invoice-details")),
+              },
+            ],
           },
 
           // ── B3 Handover & custody ──────────────────────────────────────

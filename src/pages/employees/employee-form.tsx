@@ -287,7 +287,7 @@ export function EmployeeFormSheet({
                   t("employees.company_email", "Company email"),
                   {
                     type: "email",
-                    placeholder: "name@azamtv.co.tz",
+                    placeholder: "name@azam-media.com",
                   }
                 )}
                 {text("phone", t("employees.phone", "Phone"), {

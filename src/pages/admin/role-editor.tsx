@@ -225,7 +225,7 @@ const RoleEditorPage = () => {
         <AlertDescription>
           {t(
             "roles.rules",
-            "You can only grant permissions you hold yourself, and you cannot add permissions to a role you hold. At least two active users must always hold role.manage."
+            "You cannot add permissions to a role you hold, or assign roles to yourself. At least two active users must always hold role.manage."
           )}
         </AlertDescription>
       </Alert>

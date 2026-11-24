@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, useLoaderData, useRevalidator } from "react-router"
 import { useTranslation } from "react-i18next"
 import {
@@ -28,6 +28,7 @@ import { formatStamp } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import { ROUTES, withId } from "@/routes/routeConstants"
 import { decideApproval, type ApprovalRequest } from "@/services/workflow"
+import { api } from "@/services/api"
 
 /** Where the record behind a request lives in the app. */
 function subjectLink(r: ApprovalRequest): string | null {
@@ -55,8 +56,22 @@ function subjectLink(r: ApprovalRequest): string | null {
       return withId(ROUTES.HANDOVER_DETAILS, r.subjectId)
     case "AssetReport":
       return `${ROUTES.CUSTODY}?tab=reports`
+    case "Tender":
+      return withId(ROUTES.TENDER_DETAILS, r.subjectId)
+    case "PurchaseOrder":
+      return withId(ROUTES.ORDER_DETAILS, r.subjectId)
+    case "Invoice":
+      return withId(ROUTES.INVOICE_DETAILS, r.subjectId)
+    case "PurchaseRequestLine":
+      return withId(ROUTES.PURCHASE_REQUEST_DETAILS, r.subjectId.split("#")[0])
     case "CustodyTransfer":
       return `${ROUTES.CUSTODY}?tab=transfers`
+    case "Production":
+      return withId(ROUTES.PRODUCTION_DETAILS, r.subjectId)
+    case "EquipmentBooking":
+      return withId(ROUTES.EQUIPMENT_BOOKING_DETAILS, r.subjectId)
+    case "TransportRequest":
+      return withId(ROUTES.TRANSPORT_DETAILS, r.subjectId)
     default:
       return null
   }
@@ -90,7 +105,24 @@ const ApprovalDetailsPage = () => {
     }
   }
 
-  const link = subjectLink(r)
+  // Production sub-records (crew, running order, attendance…) resolve to
+  // their production on the server.
+  const [resolved, setResolved] = useState<string | null>(null)
+  const direct = subjectLink(r)
+  useEffect(() => {
+    if (direct) return
+    let live = true
+    api
+      .get<{ path: string | null }>("/production/subject-link", {
+        params: { type: r.subjectType, id: r.subjectId },
+      })
+      .then((x) => live && setResolved(x.data.path))
+      .catch(() => undefined)
+    return () => {
+      live = false
+    }
+  }, [direct, r.subjectType, r.subjectId])
+  const link = direct ?? resolved
   const decisionLabel: Record<string, string> = {
     APPROVE: t("approvals.d_approve", "approved"),
     REJECT: t("approvals.d_reject", "rejected"),

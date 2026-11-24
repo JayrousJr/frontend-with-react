@@ -39,6 +39,8 @@ import { formatStamp } from "@/lib/format"
 import { P, hasPermission } from "@/lib/permissions"
 import { ROUTES, withId } from "@/routes/routeConstants"
 import { fetchProducts } from "@/services/products"
+import { PurchaseFileCard } from "@/pages/procurement/purchase-file"
+import { Documents } from "@/pages/procurement/documents"
 import {
   cancelPurchaseRequest,
   createPurchaseRequest,
@@ -331,6 +333,7 @@ export function PurchaseRequestDetailsPage() {
   const run = useRun()
   const { revalidate } = useRevalidator()
   const { request: r } = useLoaderData() as { request: PurchaseRequest }
+  const { user } = useAuth()
   const [cancelling, setCancelling] = useState(false)
   return (
     <div className="space-y-6">
@@ -459,6 +462,13 @@ export function PurchaseRequestDetailsPage() {
           </Table>
         </CardContent>
       </Card>
+      {hasPermission(user, P.PURCHASE_FILE_VIEW) &&
+        !["DRAFT", "IN_APPROVAL", "RETURNED"].includes(r.status) && (
+          <>
+            <PurchaseFileCard purchaseRequestUniqueId={r.uniqueId} />
+            <Documents type="PurchaseRequest" id={r.uniqueId} />
+          </>
+        )}
       {cancelling && (
         <ReasonDialog
           title={t("purchase.cancel_title", "Cancel this purchase request?")}
