@@ -441,6 +441,11 @@ export const routes = createBrowserRouter([
               lazyPage(() => import("@/pages/production/production-form")),
           },
           {
+            path: ROUTES.PRODUCTION_PACK,
+            lazy: () =>
+              lazyPage(() => import("@/pages/production/production-pack")),
+          },
+          {
             path: ROUTES.CALL_SHEET,
             lazy: () => lazyPage(() => import("@/pages/production/call-sheet")),
           },
@@ -516,6 +521,29 @@ export const routes = createBrowserRouter([
             lazy: () => lazyPage(() => import("@/pages/production/attendance")),
           },
 
+          {
+            path: ROUTES.NOTIFICATION_SETTINGS,
+            lazy: () =>
+              lazyPage(() => import("@/pages/shared/notification-settings")),
+          },
+          {
+            path: ROUTES.EMAIL_LOG,
+            lazy: () => lazyPage(() => import("@/pages/shared/email-log")),
+          },
+          {
+            path: ROUTES.NOTIFICATION_TEMPLATES,
+            lazy: () =>
+              lazyPage(() => import("@/pages/shared/notification-templates")),
+          },
+          {
+            path: ROUTES.DASHBOARD_WIDGETS,
+            lazy: () =>
+              lazyPage(() => import("@/pages/shared/dashboard-widgets")),
+          },
+          {
+            path: ROUTES.DOCUMENTS,
+            lazy: () => lazyPage(() => import("@/pages/shared/documents")),
+          },
           // ── B1 §7–§11 Tender, LPO, receiving, finance ─────────────────
           {
             element: <PermissionRoute anyPermissions={[P.VENDOR_VIEW]} />,

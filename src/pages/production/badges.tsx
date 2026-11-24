@@ -1,9 +1,14 @@
 import { useParams } from "react-router"
 import { useTranslation } from "react-i18next"
-import { PrinterIcon } from "lucide-react"
+import { MailIcon, PrinterIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/app/page-header"
-import { fetchBadges, fetchProduction } from "@/services/production"
+import { useRun } from "@/components/app/use-run"
+import {
+  emailBadges,
+  fetchBadges,
+  fetchProduction,
+} from "@/services/production"
 import { Loading } from "./ui"
 import { QrImage } from "./qr-image"
 import { useLoad } from "./utils"
@@ -11,6 +16,7 @@ import { useLoad } from "./utils"
 /** Printable personal QR badges of a production's crew. */
 const BadgesPage = () => {
   const { t } = useTranslation()
+  const run = useRun()
   const { uniqueId = "" } = useParams()
   const p = useLoad(() => fetchProduction(uniqueId), [uniqueId])
   const b = useLoad(() => fetchBadges(uniqueId), [uniqueId])
@@ -25,10 +31,28 @@ const BadgesPage = () => {
             "Personal codes: the same badge works on every production. Producers and HODs scan them at the venue (Attendance tab)."
           )}
           actions={
-            <Button onClick={() => window.print()}>
-              <PrinterIcon />
-              {t("actions.print", "Print")}
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                disabled={!b.data.length}
+                onClick={() =>
+                  run(
+                    () => emailBadges(uniqueId),
+                    t(
+                      "badges.emailed",
+                      "Badges sent to the crew's company email"
+                    )
+                  )
+                }
+              >
+                <MailIcon />
+                {t("badges.email", "Email badges to crew")}
+              </Button>
+              <Button onClick={() => window.print()}>
+                <PrinterIcon />
+                {t("actions.print", "Print")}
+              </Button>
+            </>
           }
         />
       </div>

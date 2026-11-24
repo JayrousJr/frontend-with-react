@@ -579,6 +579,7 @@ export type Booking = {
   lines: BookingLine[]
   returnStores: { id: number; name: string }[]
   collectors: { employeeId: number; name: string; employeeNumber: string }[]
+  alternatives: { assetId: number; label: string }[]
   vehicles: { assetId: number; registrationNumber: string }[]
   can: { decide: boolean; cancel: boolean; checkout: boolean; return: boolean }
 }
@@ -601,8 +602,24 @@ export const fetchBooking = (id: string) =>
 export const decideBooking = (
   id: string,
   decision: "APPROVE" | "REJECT",
-  comment?: string
-) => post<Booking>(`/production/bookings/${id}/decide`, { decision, comment })
+  comment?: string,
+  alternativeAssetIds?: number[]
+) =>
+  post<Booking>(`/production/bookings/${id}/decide`, {
+    decision,
+    comment,
+    alternativeAssetIds,
+  })
+export const fetchBookingAlternatives = (id: string) =>
+  get<
+    {
+      assetId: number
+      tag: string
+      name: string
+      condition: string
+      conflicts: string[]
+    }[]
+  >(`/production/bookings/${id}/alternatives`)
 export const cancelBooking = (id: string, reason: string) =>
   post<Booking>(`/production/bookings/${id}/cancel`, { reason })
 export const checkoutBooking = (
@@ -1324,6 +1341,10 @@ export type Badge = {
 }
 export const fetchBadges = (id: string) =>
   get<Badge[]>(`/production/productions/${id}/badges`)
+export const emailBadges = (id: string, employeeIds?: number[]) =>
+  post<{ sent: number }>(`/production/productions/${id}/badges/email`, {
+    employeeIds,
+  })
 export const fetchMyBadge = () => get<Badge>("/production/attendance/my-badge")
 export type AttendanceRow = {
   uniqueId: string
@@ -1455,3 +1476,185 @@ export const fetchDashboard = (f: {
   categoryId?: number
   departmentId?: number
 }) => get<Dashboard>("/production/dashboard", f)
+
+// ── cost estimate (budget), crew allowances, retirement, documents ───────
+
+export type AllowanceRate = {
+  id: number
+  code: string
+  name: string
+  description: string | null
+  amount: number
+  currency: "TZS" | "USD"
+  isActive: boolean
+  sortOrder: number
+}
+export type BudgetItem = {
+  id: number
+  name: string
+  kind: "CASH" | "FUEL"
+  isActive: boolean
+  sortOrder: number
+}
+export type BudgetSettings = { rates: AllowanceRate[]; items: BudgetItem[] }
+export type BudgetLine = {
+  id?: number
+  kind: "EXPENSE" | "FUEL" | "CREW"
+  description: string
+  payee: string | null
+  currency: "TZS" | "USD"
+  amount: number
+  km: number | null
+  litres: number | null
+  supplier: string | null
+  remarks: string | null
+  employeeId: number | null
+  employeeNumber?: string | null
+  role: string | null
+  days: number | null
+  rate: number | null
+  rateCode: string | null
+  rateOverrideReason: string | null
+  bankName: string | null
+  bankAccount: string | null
+  actualAmount?: number | null
+  receiptRef?: string | null
+  paid?: boolean
+}
+type Money = { TZS: number; USD: number }
+export type Budget =
+  | { exists: false; settings: BudgetSettings; can: { create: boolean } }
+  | {
+      exists: true
+      settings: BudgetSettings
+      uniqueId: string
+      number: string
+      title: string
+      productionStatus: ProductionStatus
+      status: string
+      rate: AllowanceRate | null
+      travelFrom: string | null
+      travelReturn: string | null
+      liveFrom: string | null
+      liveTo: string | null
+      city: string | null
+      equipmentNote: string | null
+      exchangeRate: number | null
+      notes: string | null
+      createdBy: string
+      approval: { uniqueId: string; status: string } | null
+      retirementApproval: { uniqueId: string; status: string } | null
+      approvedAt: string | null
+      retiredAt: string | null
+      advanceTaken: number | null
+      retirementNote: string | null
+      balance: number | null
+      totals: {
+        expenses: Money
+        crew: Money
+        all: Money
+        actual: Money
+        allInTzs: number | null
+        actualInTzs: number | null
+        litres: number
+      }
+      crewCount: number
+      lines: BudgetLine[]
+      can: { edit: boolean; submit: boolean; retire: boolean }
+    }
+export type BudgetInput = {
+  allowanceRateId?: number | null
+  travelFrom?: string | null
+  travelReturn?: string | null
+  liveFrom?: string | null
+  liveTo?: string | null
+  city?: string | null
+  equipmentNote?: string | null
+  exchangeRate?: number | null
+  notes?: string | null
+  lines: BudgetLine[]
+}
+export const fetchBudgetSettings = () =>
+  get<BudgetSettings>("/production/budget-settings")
+export const saveAllowanceRate = (b: Partial<AllowanceRate>) =>
+  put<BudgetSettings>("/production/budget-settings/rates", b)
+export const saveBudgetItem = (b: Partial<BudgetItem>) =>
+  put<BudgetSettings>("/production/budget-settings/items", b)
+export const fetchBudget = (id: string) =>
+  get<Budget>(`/production/productions/${id}/budget`)
+export const createBudget = (id: string, allowanceRateId?: number) =>
+  post<Budget>(`/production/productions/${id}/budget`, { allowanceRateId })
+export const updateBudget = (id: string, b: BudgetInput) =>
+  put<Budget>(`/production/productions/${id}/budget`, b)
+export const applyBudgetRate = (id: string, rateId: number) =>
+  post<Budget>(`/production/productions/${id}/budget/apply-rate`, { rateId })
+export const refreshBudgetCrew = (id: string) =>
+  post<Budget>(`/production/productions/${id}/budget/refresh-crew`)
+export const submitBudget = (id: string) =>
+  post<Budget>(`/production/productions/${id}/budget/submit`)
+export const saveRetirement = (
+  id: string,
+  b: {
+    advanceTaken?: number | null
+    retirementNote?: string | null
+    lines: {
+      id: number
+      actualAmount?: number | null
+      receiptRef?: string | null
+      paid?: boolean
+    }[]
+    submit?: boolean
+  }
+) => put<Budget>(`/production/productions/${id}/budget/retirement`, b)
+export type ProductionDocs = {
+  crewDocument: {
+    number: string
+    title: string
+    category: string
+    venues: string
+    producer: string
+    callTime: string
+    liveTime: string
+    from: string
+    to: string
+    facilities: string[]
+    crew: {
+      name: string
+      employeeNumber: string
+      role: string
+      jobTitle: string
+      department: string
+      phone: string
+    }[]
+  }
+  equipmentUsed: {
+    booking: string
+    store: string
+    tag: string
+    item: string
+    category: string
+    quantity: number
+    consumable: boolean
+    out: string
+    returned: string | number
+    returnStore: string
+    report: string
+    checkedOutAt: string | null
+    returnedAt: string | null
+  }[]
+  budget: Extract<Budget, { exists: true }> | null
+}
+export const fetchProductionDocs = (id: string) =>
+  get<ProductionDocs>(`/production/productions/${id}/production-documents`)
+export const storeProductionPack = (id: string) =>
+  post(`/production/productions/${id}/production-pack`)
+export async function downloadProductionPack(id: string, number: string) {
+  const r = await api.get<Blob>(
+    `/production/productions/${id}/production-pack.xlsx`,
+    { responseType: "blob" }
+  )
+  const a = document.createElement("a")
+  a.href = URL.createObjectURL(r.data)
+  a.download = `${number}-production-pack.xlsx`
+  a.click()
+}

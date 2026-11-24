@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link, useParams } from "react-router"
+import { Link, useNavigate, useParams } from "react-router"
 import { useTranslation } from "react-i18next"
 import {
   CheckIcon,
@@ -22,8 +22,10 @@ import { ROUTES, withId } from "@/routes/routeConstants"
 import {
   cancelBooking,
   checkoutBooking,
+  createBooking,
   decideBooking,
   fetchBooking,
+  fetchBookingAlternatives,
   returnBooking,
   type Booking,
 } from "@/services/production"
@@ -387,6 +389,66 @@ function Return({
   )
 }
 
+/** Storekeeper: free items of the same categories in this store. */
+function AlternativesPicker({
+  id,
+  value,
+  onChange,
+}: {
+  id: string
+  value: number[]
+  onChange: (v: number[]) => void
+}) {
+  const { t } = useTranslation()
+  const alt = useLoad(() => fetchBookingAlternatives(id), [id])
+  if (!alt.data) return <Loading error={alt.error} />
+  return (
+    <div className="space-y-1">
+      <div className="text-sm font-medium">
+        {t(
+          "bookings.propose",
+          "Propose available alternatives (same categories, this store)"
+        )}
+      </div>
+      {alt.data.length === 0 && (
+        <p className="text-xs text-muted-foreground">
+          {t(
+            "bookings.no_alternatives",
+            "No free items of the same categories in this store."
+          )}
+        </p>
+      )}
+      <div className="max-h-56 space-y-1 overflow-y-auto">
+        {alt.data.map((a) => (
+          <label
+            key={a.assetId}
+            className="flex items-start gap-2 rounded border px-2 py-1 text-sm"
+          >
+            <Checkbox
+              checked={value.includes(a.assetId)}
+              onCheckedChange={(c) =>
+                onChange(
+                  c === true
+                    ? [...value, a.assetId]
+                    : value.filter((x) => x !== a.assetId)
+                )
+              }
+            />
+            <span>
+              <span className="font-mono">{a.tag}</span> {a.name}
+              {a.conflicts.map((c, i) => (
+                <span key={i} className="block text-xs text-amber-700">
+                  {c}
+                </span>
+              ))}
+            </span>
+          </label>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 const BookingDetailsPage = () => {
   const { t } = useTranslation()
   const run = useRun()
@@ -396,6 +458,8 @@ const BookingDetailsPage = () => {
     null | "out" | "in" | "reject" | "cancel"
   >(null)
   const [reason, setReason] = useState("")
+  const [alts, setAlts] = useState<number[]>([])
+  const navigate = useNavigate()
   if (!b.data) return <Loading error={b.error} />
   const d = b.data
   return (
@@ -512,6 +576,48 @@ const BookingDetailsPage = () => {
           ]}
         />
       </Section>
+      {d.alternatives.length > 0 && (
+        <Section
+          title={t(
+            "bookings.alternatives",
+            "Alternatives proposed by the store"
+          )}
+          actions={
+            d.status === "REJECTED" && (
+              <Button
+                size="sm"
+                onClick={() =>
+                  run(
+                    async () => {
+                      const nb = await createBooking({
+                        productionUniqueId: d.productionUniqueId,
+                        departmentId: d.departmentId,
+                        storeId: d.storeId,
+                        intendedUse: d.intendedUse,
+                        lines: d.alternatives.map((a) => ({
+                          assetId: a.assetId,
+                        })),
+                      })
+                      navigate(
+                        withId(ROUTES.EQUIPMENT_BOOKING_DETAILS, nb.uniqueId)
+                      )
+                    },
+                    t("bookings.sent", "Booking sent to the storekeeper")
+                  )
+                }
+              >
+                {t("bookings.book_alternatives", "Book these instead")}
+              </Button>
+            )
+          }
+        >
+          <ul className="text-sm">
+            {d.alternatives.map((a) => (
+              <li key={a.assetId}>{a.label}</li>
+            ))}
+          </ul>
+        </Section>
+      )}
       <Section title={t("bookings.items", "Items")}>
         <SimpleTable
           head={[
@@ -603,7 +709,7 @@ const BookingDetailsPage = () => {
           onConfirm={() =>
             dialog === "reject"
               ? run(async () => {
-                  await decideBooking(d.uniqueId, "REJECT", reason)
+                  await decideBooking(d.uniqueId, "REJECT", reason, alts)
                   setTimeout(b.reload, 1500)
                 })
               : run(async () => b.set(await cancelBooking(d.uniqueId, reason)))
@@ -614,6 +720,13 @@ const BookingDetailsPage = () => {
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           />
+          {dialog === "reject" && (
+            <AlternativesPicker
+              id={d.uniqueId}
+              value={alts}
+              onChange={setAlts}
+            />
+          )}
         </FormDialog>
       )}
     </div>

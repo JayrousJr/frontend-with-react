@@ -33,10 +33,14 @@ import { ExecutionTab } from "./tab-execution"
 import { AttendanceTab } from "./tab-attendance"
 import { ClosureTab } from "./tab-closure"
 import { MessagesTab } from "./tab-messages"
+import { BudgetTab } from "./tab-budget"
+import { useAuth } from "@/context/auth-context"
+import { P, hasAnyPermission } from "@/lib/permissions"
 
 const ProductionDetailsPage = () => {
   const { t } = useTranslation()
   const run = useRun()
+  const { user } = useAuth()
   const { uniqueId = "" } = useParams()
   const [params, setParams] = useSearchParams()
   const tab = (PRODUCTION_TABS as readonly string[]).includes(
@@ -70,6 +74,12 @@ const ProductionDetailsPage = () => {
       "closure",
       t("prod_tabs.closure", "Closure"),
       ["COMPLETED", "CLOSED"].includes(d.status),
+    ],
+    [
+      "budget",
+      t("prod_tabs.budget", "Cost estimate"),
+      hasAnyPermission(user, [P.BUDGET_VIEW, P.BUDGET_EDIT]) &&
+        !["DRAFT", "SUBMITTED", "UNDER_REVIEW", "REJECTED"].includes(d.status),
     ],
     ["messages", t("prod_tabs.messages", "Messages"), true],
   ]
@@ -202,6 +212,9 @@ const ProductionDetailsPage = () => {
         </TabsContent>
         <TabsContent value="closure">
           <ClosureTab p={d} onStatus={p.reload} />
+        </TabsContent>
+        <TabsContent value="budget">
+          <BudgetTab p={d} />
         </TabsContent>
         <TabsContent value="messages">
           <MessagesTab p={d} />

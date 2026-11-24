@@ -70,6 +70,68 @@ const fromConfig = (s: StepConfig): DraftStep => ({
   slaHours: s.slaHours ?? undefined,
 })
 
+const DOC_CATEGORIES = [
+  "Production brief",
+  "Technical requirements",
+  "Running order",
+  "Call sheet",
+  "Equipment allocation sheet",
+  "Transport arrangements",
+  "Permit",
+  "Risk assessment",
+  "Location agreement",
+  "Completion report",
+  "Production pack",
+  "Other",
+]
+
+/** document.approval: run this step only for the ticked categories. */
+function DocumentCategoryCondition({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (v: string) => void
+}) {
+  let picked: string[] = []
+  try {
+    const c = JSON.parse(value) as { path?: string; value?: unknown }
+    if (c.path === "category" && Array.isArray(c.value))
+      picked = c.value as string[]
+  } catch {
+    picked = []
+  }
+  const set = (next: string[]) =>
+    onChange(
+      next.length
+        ? JSON.stringify({ path: "category", op: "in", value: next })
+        : ""
+    )
+  return (
+    <div className="mt-2 grid grid-cols-2 gap-1 text-xs">
+      <span className="col-span-2 text-muted-foreground">
+        Only for these document categories (none ticked = every category):
+      </span>
+      {DOC_CATEGORIES.map((c) => (
+        <label key={c} className="flex items-center gap-1">
+          <input
+            type="checkbox"
+            checked={picked.includes(c)}
+            onChange={(e) =>
+              set(
+                e.target.checked
+                  ? [...picked, c]
+                  : picked.filter((x) => x !== c)
+              )
+            }
+          />
+          {c}
+        </label>
+      ))}
+    </div>
+  )
+}
+
 const WorkflowEditorPage = () => {
   const { t } = useTranslation()
   const { user } = useAuth()
@@ -447,6 +509,12 @@ const WorkflowEditorPage = () => {
                       update(s.key, { condition: e.target.value })
                     }
                   />
+                  {point.code === "document.approval" && (
+                    <DocumentCategoryCondition
+                      value={s.condition ?? ""}
+                      onChange={(condition) => update(s.key, { condition })}
+                    />
+                  )}
                 </Field>
                 <div className="flex items-center gap-2 md:col-span-2">
                   <Switch

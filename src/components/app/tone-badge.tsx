@@ -78,6 +78,7 @@ const TONE: Record<string, string> = {
   EXCUSED: GREY,
   ON_LEAVE: GREY,
   HALF_DAY: SKY,
+  RETIREMENT_SUBMITTED: AMBER,
 }
 
 /** Status badge for B1/B2 codes; label from `codes.<CODE>` translations. */

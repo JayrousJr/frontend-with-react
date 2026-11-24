@@ -23,6 +23,9 @@ import {
 } from "@/services/production"
 import { FormDialog, Loading, Section, SimpleTable } from "./ui"
 import { useLoad } from "./utils"
+import { AllowanceSettings } from "./allowance-settings"
+import { useAuth } from "@/context/auth-context"
+import { P, hasPermission } from "@/lib/permissions"
 
 const AUTO_KEYS = [
   "",
@@ -45,6 +48,7 @@ const active = (on: boolean) => <ToneBadge code={on ? "ACTIVE" : "INACTIVE"} />
 const ProductionSettingsPage = () => {
   const { t } = useTranslation()
   const run = useRun()
+  const { user } = useAuth()
   const cfg = useLoad(fetchConfig)
   const [cat, setCat] = useState<Partial<Category> | null>(null)
   const [role, setRole] = useState<
@@ -89,6 +93,9 @@ const ProductionSettingsPage = () => {
           </TabsTrigger>
           <TabsTrigger value="templates">
             {t("prod_settings.templates", "Checklist templates")}
+          </TabsTrigger>
+          <TabsTrigger value="allowances">
+            {t("allowance.title", "Crew allowance rates")}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="categories">
@@ -195,6 +202,11 @@ const ProductionSettingsPage = () => {
               ])}
             />
           </Section>
+        </TabsContent>
+        <TabsContent value="allowances">
+          <AllowanceSettings
+            canEdit={hasPermission(user, P.ALLOWANCE_MANAGE)}
+          />
         </TabsContent>
         <TabsContent value="templates">
           <Section

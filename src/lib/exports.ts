@@ -93,6 +93,21 @@ export const navMain: NavMainItem[] = [
         ],
       },
       {
+        id: "notification-settings",
+        title: () => t("nav.notification_settings", "My notifications"),
+        url: ROUTES.NOTIFICATION_SETTINGS,
+      },
+      {
+        id: "documents",
+        title: () => t("nav.documents", "Documents"),
+        url: ROUTES.DOCUMENTS,
+        anyPermissions: [
+          P.DOCUMENT_VIEW_ALL,
+          P.PRODUCTION_VIEW,
+          P.PURCHASE_FILE_VIEW,
+        ],
+      },
+      {
         id: "delegations",
         title: () => t("nav.delegations", "Delegations"),
         url: ROUTES.DELEGATIONS,
@@ -248,7 +263,7 @@ export const navMain: NavMainItem[] = [
         id: "production-settings",
         title: () => t("nav.production_settings", "Production settings"),
         url: ROUTES.PRODUCTION_SETTINGS,
-        anyPermissions: [P.PRODUCTION_CONFIG],
+        anyPermissions: [P.PRODUCTION_CONFIG, P.ALLOWANCE_MANAGE],
       },
     ],
   },
@@ -464,6 +479,24 @@ export const navMain: NavMainItem[] = [
         title: () => t("nav.policies", "SoD & security settings"),
         url: ROUTES.POLICIES,
         requiredPermissions: [P.POLICY_VIEW],
+      },
+      {
+        id: "email-log",
+        title: () => t("nav.email_log", "Email delivery"),
+        url: ROUTES.EMAIL_LOG,
+        requiredPermissions: [P.NOTIFICATION_MANAGE],
+      },
+      {
+        id: "notification-templates",
+        title: () => t("nav.notification_templates", "Notification texts"),
+        url: ROUTES.NOTIFICATION_TEMPLATES,
+        requiredPermissions: [P.NOTIFICATION_MANAGE],
+      },
+      {
+        id: "dashboard-widgets",
+        title: () => t("nav.dashboard_widgets", "Dashboard sections"),
+        url: ROUTES.DASHBOARD_WIDGETS,
+        requiredPermissions: [P.DASHBOARD_CONFIGURE],
       },
       {
         id: "audit",

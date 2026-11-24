@@ -105,6 +105,7 @@ export const ROUTES = {
   PRODUCTION_EDIT: "/productions/:uniqueId/edit",
   PRODUCTION_DETAILS: "/productions/:uniqueId",
   CALL_SHEET: "/productions/:uniqueId/call-sheet",
+  PRODUCTION_PACK: "/productions/:uniqueId/documents",
   BADGES: "/productions/:uniqueId/badges",
   PRODUCTION_CALENDAR: "/production-calendar",
   MY_PRODUCTIONS: "/my-productions",
@@ -120,6 +121,12 @@ export const ROUTES = {
   CREW_OVERVIEW: "/crew-overview",
   PRODUCTION_SETTINGS: "/production-settings",
   ATTENDANCE: "/attendance",
+  // Shared services
+  NOTIFICATION_SETTINGS: "/notification-settings",
+  EMAIL_LOG: "/admin/email-log",
+  NOTIFICATION_TEMPLATES: "/admin/notification-texts",
+  DASHBOARD_WIDGETS: "/admin/dashboard-sections",
+  DOCUMENTS: "/documents",
 
   // Error
   NOT_FOUND: "/404",

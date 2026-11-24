@@ -129,6 +129,13 @@ export const P = {
   DASHBOARD_VIEW: "management_dashboard.view",
   ATTENDANCE_RECORD: "attendance.record",
   ATTENDANCE_VIEW: "attendance.view",
+  // Shared services (09, 14)
+  NOTIFICATION_MANAGE: "notification.manage",
+  DASHBOARD_CONFIGURE: "dashboard.configure",
+  DOCUMENT_VIEW_ALL: "document.view_all",
+  BUDGET_VIEW: "production_budget.view",
+  BUDGET_EDIT: "production_budget.edit",
+  ALLOWANCE_MANAGE: "crew_allowance_rate.manage",
 } as const
 
 /**

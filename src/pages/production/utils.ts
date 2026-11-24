@@ -52,6 +52,12 @@ export function eatDay(d: Date): string {
   return new Date(d.getTime() + 3 * 3_600_000).toISOString().slice(0, 10)
 }
 
+/** "TZS 120,000" */
+export const money = (n: number | null | undefined, cur = "TZS") =>
+  n == null
+    ? "—"
+    : `${cur} ${n.toLocaleString("en-US", { maximumFractionDigits: 2 })}`
+
 export const PRODUCTION_TABS = [
   "overview",
   "crew",
@@ -63,6 +69,7 @@ export const PRODUCTION_TABS = [
   "execution",
   "attendance",
   "closure",
+  "budget",
   "messages",
 ] as const
 export type ProductionTab = (typeof PRODUCTION_TABS)[number]
