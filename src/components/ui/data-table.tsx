@@ -12,13 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { ComboboxSelect } from "@/components/ui/combobox-select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -43,6 +37,11 @@ export interface FilterConfig {
   label: string
   options: FilterOption[]
 }
+
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100].map((s) => ({
+  value: String(s),
+  label: String(s),
+}))
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -146,30 +145,25 @@ export function DataTable<TData, TValue>({
         )}
 
         {filters.map((filter) => (
-          <Select
+          <ComboboxSelect
             key={filter.key}
-            value={activeFilters[filter.key] ?? "all"}
+            aria-label={filter.label}
+            className="h-9 w-40"
+            icon={
+              <SlidersHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
+            }
+            options={[
+              {
+                value: "all",
+                label: t("dataTable.all_option", { label: filter.label }),
+              },
+              ...filter.options,
+            ]}
+            value={activeFilters[filter.key] || "all"}
             onValueChange={(val) =>
               onFilterChange?.(filter.key, val === "all" ? "" : val)
             }
-          >
-            <SelectTrigger className="h-9 w-40">
-              <div className="flex items-center gap-1.5">
-                <SlidersHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
-                <SelectValue placeholder={filter.label} />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">
-                {t("dataTable.all_option", { label: filter.label })}
-              </SelectItem>
-              {filter.options.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
         ))}
 
         {hasActiveFilters && onClearFilters && (
@@ -261,24 +255,19 @@ export function DataTable<TData, TValue>({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span>{t("dataTable.rows_per_page")}</span>
-          <Select
+          <ComboboxSelect
+            aria-label={t("dataTable.rows_per_page")}
+            size="sm"
+            className="w-18"
+            side="top"
+            searchable={false}
+            options={PAGE_SIZE_OPTIONS}
             value={String(pageSize)}
             onValueChange={(v) => {
               onPageSizeChange(Number(v))
               onPageChange(1)
             }}
-          >
-            <SelectTrigger className="h-8 w-18">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent side="top">
-              {[10, 20, 50, 100].map((s) => (
-                <SelectItem key={s} value={String(s)}>
-                  {s}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
         </div>
 
         <div className="flex items-center gap-4 text-sm">

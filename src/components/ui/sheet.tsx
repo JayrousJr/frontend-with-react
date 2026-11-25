@@ -2,6 +2,10 @@ import * as React from "react"
 import { Dialog as SheetPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
+import {
+  PortalContainerContext,
+  usePortalContainerRef,
+} from "@/lib/portal-container"
 import { Button } from "@/components/ui/button"
 import { XIcon } from "lucide-react"
 
@@ -46,6 +50,7 @@ function SheetOverlay({
 function SheetContent({
   className,
   children,
+  ref,
   side = "right",
   showCloseButton = true,
   ...props
@@ -53,10 +58,12 @@ function SheetContent({
   side?: "top" | "right" | "bottom" | "left"
   showCloseButton?: boolean
 }) {
+  const [container, containerRef] = usePortalContainerRef(ref)
   return (
     <SheetPortal>
       <SheetOverlay />
       <SheetPrimitive.Content
+        ref={containerRef}
         data-slot="sheet-content"
         data-side={side}
         className={cn(
@@ -65,7 +72,9 @@ function SheetContent({
         )}
         {...props}
       >
-        {children}
+        <PortalContainerContext.Provider value={container}>
+          {children}
+        </PortalContainerContext.Provider>
         {showCloseButton && (
           <SheetPrimitive.Close data-slot="sheet-close" asChild>
             <Button

@@ -13,13 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { ComboboxSelect } from "@/components/ui/combobox-select"
 import { Separator } from "@/components/ui/separator"
 import { useAuth } from "@/context/auth-context"
 import {
@@ -196,21 +190,16 @@ const UserDetailsPage = () => {
             <CardDescription>{t("rbac.assign_role_text")}</CardDescription>
           </CardHeader>
           <CardContent className="flex items-center gap-3">
-            <Select value={selectedRole} onValueChange={setSelectedRole}>
-              <SelectTrigger className="w-56">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {(roles.length > 0
-                  ? roles.map((role) => role.name)
-                  : [user.role.name]
-                ).map((roleName) => (
-                  <SelectItem key={roleName} value={roleName}>
-                    {roleName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <ComboboxSelect
+              aria-label={t("rbac.assign_role")}
+              className="w-56"
+              options={(roles.length > 0
+                ? roles.map((role) => role.name)
+                : [user.role.name]
+              ).map((roleName) => ({ value: roleName, label: roleName }))}
+              value={selectedRole}
+              onValueChange={setSelectedRole}
+            />
             <Button
               onClick={handleAssignRole}
               disabled={isAssigning || selectedRole === user.role.name}

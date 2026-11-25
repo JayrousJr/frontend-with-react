@@ -1,20 +1,14 @@
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
 import { Button } from "./ui/button"
+import { ComboboxSelect } from "./ui/combobox-select"
 import { fetchSupportedLocales, updateProfile } from "@/services/account"
 import { useAuth } from "@/context/auth-context"
 import { languageLogos } from "@/config/languageLogos"
 import { toast } from "sonner"
 
 const LanguageSwitcher = () => {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const [locales, setLocale] = useState<string[]>([])
   const { refreshUser, user } = useAuth()
 
@@ -54,9 +48,28 @@ const LanguageSwitcher = () => {
     }
   }
 
+  const options = locales.map((language) => ({
+    value: language,
+    label: language.toUpperCase(),
+    icon: (
+      <img
+        src={languageLogos[language] ?? languageLogos.en}
+        alt=""
+        className="h-5 w-5 rounded-xs object-cover"
+      />
+    ),
+  }))
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <ComboboxSelect
+      aria-label={t("profile.language")}
+      options={options}
+      value={activeLocale}
+      onValueChange={(language) => void handleLanguageChange(language)}
+      searchable={options.length > 5}
+      align="end"
+      contentClassName="w-36"
+      trigger={
         <Button
           variant="ghost"
           size="icon"
@@ -68,31 +81,8 @@ const LanguageSwitcher = () => {
             className="h-6 w-6 rounded-sm object-cover"
           />
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-32">
-        <DropdownMenuGroup>
-          {locales.map((language) => {
-            const languageUrl = languageLogos[language] ?? languageLogos.en
-            return (
-              <DropdownMenuItem
-                key={language}
-                onClick={() => handleLanguageChange(language)}
-                className={`my-0.5 flex cursor-pointer items-center gap-2 ${
-                  activeLocale === language ? "bg-accent font-semibold" : ""
-                }`}
-              >
-                <img
-                  src={languageUrl}
-                  alt=""
-                  className="h-5 w-5 rounded-xs object-cover"
-                />
-                <span className="text-sm uppercase">{language}</span>
-              </DropdownMenuItem>
-            )
-          })}
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      }
+    />
   )
 }
 

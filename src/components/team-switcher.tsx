@@ -2,15 +2,8 @@
 
 import * as React from "react"
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { ComboboxSelect } from "@/components/ui/combobox-select"
+import { Button } from "@/components/ui/button"
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -24,6 +17,20 @@ export function TeamSwitcher() {
   const { isMobile } = useSidebar()
   const [activeTeam, setActiveTeam] = React.useState(teams[0])
 
+  const options = React.useMemo(
+    () =>
+      teams.map((team) => ({
+        value: team.name,
+        label: team.name,
+        icon: (
+          <div className="flex size-6 shrink-0 items-center justify-center rounded-md border">
+            <team.logo />
+          </div>
+        ),
+      })),
+    []
+  )
+
   if (!activeTeam) {
     return null
   }
@@ -31,11 +38,22 @@ export function TeamSwitcher() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        <ComboboxSelect
+          aria-label="Teams"
+          options={options}
+          value={activeTeam.name}
+          onValueChange={(name) => {
+            const team = teams.find((t) => t.name === name)
+            if (team) setActiveTeam(team)
+          }}
+          searchable={teams.length > 5}
+          side={isMobile ? "bottom" : "right"}
+          contentClassName="w-56"
+          itemClassName="gap-2 p-2"
+          trigger={
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <activeTeam.logo />
@@ -46,38 +64,19 @@ export function TeamSwitcher() {
               </div>
               <ChevronsUpDownIcon className="ml-auto" />
             </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-fit"
-            align="start"
-            side={isMobile ? "bottom" : "right"}
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Teams
-            </DropdownMenuLabel>
-            {teams.map((team, index) => (
-              <DropdownMenuItem
-                key={team.name}
-                onClick={() => setActiveTeam(team)}
-                className="gap-2 p-2"
-              >
-                <div className="flex size-6 items-center justify-center rounded-md border">
-                  <team.logo />
-                </div>
-                {team.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            ))}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
+          }
+          footer={
+            <Button
+              variant="ghost"
+              className="h-auto w-full justify-start gap-2 p-2 font-medium text-muted-foreground"
+            >
               <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                 <PlusIcon className="size-4" />
               </div>
-              <div className="font-medium text-muted-foreground">Add team</div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              Add team
+            </Button>
+          }
+        />
       </SidebarMenuItem>
     </SidebarMenu>
   )
